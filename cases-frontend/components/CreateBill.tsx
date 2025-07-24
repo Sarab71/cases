@@ -195,17 +195,18 @@ export default function CreateBillForm() {
       };
     });
 
-    const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/customers`, {
+    const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/bills/generate-pdf`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         invoiceNumber,
         customer: selectedCustomer,
-        items: processedItems, // ✅ now totalAmount is included
+        items: processedItems,
         grandTotal,
-        date: new Date().toLocaleDateString(),
+        date: billDate,
       }),
     });
+
 
     if (res.ok) {
       const blob = await res.blob();
