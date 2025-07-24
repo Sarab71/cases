@@ -133,7 +133,7 @@ export default function EditBillForm({ billId, onClose, onUpdated }: EditBillFor
 
     const grandTotal = processedItems.reduce((sum, item) => sum + item.totalAmount!, 0);
 
-    const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/customers`, {
+    const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/generate-pdf`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
