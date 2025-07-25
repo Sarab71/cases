@@ -195,7 +195,7 @@ export default function CreateBillForm() {
       };
     });
 
-    const res = await fetch('/api/generate-pdf', {
+    const res = await fetch(`${process.env.NEXT_PUBLIC_PDF_API_URL}/generate-pdf`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
