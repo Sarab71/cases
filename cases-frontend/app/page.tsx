@@ -33,7 +33,6 @@ export default function Home() {
             onChange={e => setEndDate(e.target.value)}
             className="border rounded p-1"
             min={startDate || undefined}
-            max={new Date().toISOString().split('T')[0]}
           />
         </div>
       </div>
