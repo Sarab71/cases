@@ -9,9 +9,10 @@ interface Customer {
 
 interface CustomerSideBarProps {
   onSelectCustomer: (customerId: string, customerName: string) => void;
+  refreshTrigger?: any;
 }
 
-export default function CustomerSideBar({ onSelectCustomer }: CustomerSideBarProps) {
+export default function CustomerSideBar({ onSelectCustomer, refreshTrigger }: CustomerSideBarProps) {
   const [customers, setCustomers] = useState<Customer[]>([]);
 
   useEffect(() => {
@@ -28,7 +29,7 @@ export default function CustomerSideBar({ onSelectCustomer }: CustomerSideBarPro
     };
 
     fetchCustomers();
-  }, []);
+  }, [refreshTrigger]);
 
   return (
     <aside className="w-64 fixed top-0 left-0 h-screen bg-blue-700 p-4 overflow-y-auto shadow-lg">
