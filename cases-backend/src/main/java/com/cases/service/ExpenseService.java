@@ -126,4 +126,12 @@ public class ExpenseService {
                 .toList();
     }
 
+    public void deleteCategory(String categoryName) {
+        Optional<ExpenseCategory> optional = categoryRepository.findByCategory(categoryName);
+        if (optional.isEmpty()) {
+            throw new IllegalArgumentException("Category not found");
+        }
+        categoryRepository.delete(optional.get());
+    }
+
 }

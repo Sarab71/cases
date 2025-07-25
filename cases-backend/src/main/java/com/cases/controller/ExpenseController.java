@@ -73,4 +73,14 @@ public class ExpenseController {
             return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
         }
     }
+
+    @DeleteMapping("/category")
+    public ResponseEntity<?> deleteCategory(@RequestParam String category) {
+        try {
+            expenseService.deleteCategory(category);
+            return ResponseEntity.ok(Map.of("message", "Category deleted successfully"));
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
+        }
+    }
 }
