@@ -51,7 +51,7 @@ export default function EditCustomerForm({ customerId, onClose, onUpdated }: Edi
 
     try {
       const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/customers/${customerId}`, {
-        method: 'PATCH', // or 'PUT' based on your API
+        method: 'PUT', // or 'PUT' based on your API
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ name, phone, address }),
       });
