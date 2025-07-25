@@ -1,7 +1,6 @@
 'use client';
 
 import { useState } from 'react';
-import { toast } from 'react-toastify';
 import CustomerSideBar from '@/components/CustomerSideBar';
 import CustomerStatement from '@/components/CustomerStatement';
 import EditCustomerForm from '@/components/EditCustomerForm';
