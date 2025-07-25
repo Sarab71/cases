@@ -39,6 +39,19 @@ export default function ExpensesList() {
         }
     };
 
+    const handleDeleteCategory = async (category: string) => {
+        if (!confirm(`Delete entire category "${category}"? This cannot be undone.`)) return;
+
+        const params = new URLSearchParams({ category });
+        const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/expenses/category?${params}`, {
+            method: 'DELETE',
+        });
+
+        if (res.ok) {
+            fetchExpenses();  // Refresh list after category delete
+        }
+    };
+
     useEffect(() => {
         fetchExpenses();
     }, []);
@@ -47,11 +60,20 @@ export default function ExpensesList() {
         <div>
             <h2 className="text-xl font-bold mb-4">Expenses</h2>
             {categories.map(category => (
-                <div key={category.id} className="mb-6">
-                    <h3 className="text-lg font-semibold">{category.category}</h3>
+                <div key={category.id} className="mb-6 border border-gray-200 rounded p-4">
+                    <div className="flex justify-between items-center mb-2">
+                        <h3 className="text-lg font-semibold">{category.category}</h3>
+                        <button
+                            onClick={() => handleDeleteCategory(category.category)}
+                            className="text-red-600 text-sm hover:underline"
+                        >
+                            Delete Category
+                        </button>
+                    </div>
+
                     <ul>
                         {category.expenses.map((expense, index) => (
-                            <li key={expense.id} className="flex justify-between items-center border-b py-1">
+                            <li key={`${expense.description}-${index}`} className="flex justify-between items-center border-b py-1">
                                 <div>
                                     <p>{expense.description} - ₹{expense.amount}</p>
                                     <small>{new Date(expense.date).toLocaleDateString()}</small>
