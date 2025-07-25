@@ -28,17 +28,17 @@ export default function CreateBillForm() {
   const [grandTotal, setGrandTotal] = useState<number>(0);
   const [selectedIndex, setSelectedIndex] = useState<number>(-1);
 
-  useEffect(() => {
-    const fetchNextInvoiceNumber = async () => {
-      try {
-        const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/bills/next-invoice-number`);
-        const number = await res.json();
-        setInvoiceNumber(number);
-      } catch (err) {
-        console.error('Failed to fetch invoice number', err);
-      }
-    };
+  const fetchNextInvoiceNumber = async () => {
+    try {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/bills/next-invoice-number`);
+      const number = await res.json();
+      setInvoiceNumber(number);
+    } catch (err) {
+      console.error('Failed to fetch invoice number', err);
+    }
+  };
 
+  useEffect(() => {
     fetchNextInvoiceNumber();
   }, []);
 
@@ -167,6 +167,7 @@ export default function CreateBillForm() {
       toast.success('Bill created successfully');
       resetForm();
       setBillDate(new Date().toISOString().split('T')[0]);
+      await fetchNextInvoiceNumber();
     } catch (err) {
       console.error(err);
       toast.error('Failed to create bill');
