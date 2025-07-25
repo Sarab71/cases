@@ -1,30 +1,57 @@
 'use client';
 
 import { useState } from 'react';
+import { toast } from 'react-toastify';
 import CustomerSideBar from '@/components/CustomerSideBar';
 import CustomerStatement from '@/components/CustomerStatement';
+import EditCustomerForm from '@/components/EditCustomerForm';
 
 export default function CustomersPage() {
   const [selectedCustomerId, setSelectedCustomerId] = useState<string | null>(null);
   const [selectedCustomerName, setSelectedCustomerName] = useState<string>('');
+  const [showEditForm, setShowEditForm] = useState(false);
 
   const handleSelectCustomer = (customerId: string, customerName: string) => {
     setSelectedCustomerId(customerId);
     setSelectedCustomerName(customerName);
+    setShowEditForm(false); // reset form on new selection
   };
 
   return (
     <div className="flex">
       <CustomerSideBar onSelectCustomer={handleSelectCustomer} />
 
-      <div className="flex-1 p-4 ml-64"> {/* ml-64 to push content beside fixed sidebar */}
-        <h1 className="text-2xl font-bold mb-4">Customer Details</h1>
+      <div className="flex-1 p-4 ml-64">
+        <div className="flex justify-between items-center mb-4">
+          <h1 className="text-2xl font-bold">Customer Details</h1>
+          {selectedCustomerId && (
+            <button
+              onClick={() => setShowEditForm(!showEditForm)}
+              className="bg-blue-600 text-white px-3 py-1 rounded"
+            >
+              {showEditForm ? 'Close Edit' : 'Edit'}
+            </button>
+          )}
+        </div>
 
         {selectedCustomerId ? (
-          <CustomerStatement
-            customerId={selectedCustomerId}
-            customerName={selectedCustomerName}
-          />
+          <>
+            <CustomerStatement
+              customerId={selectedCustomerId}
+              customerName={selectedCustomerName}
+            />
+
+            {showEditForm && (
+              <EditCustomerForm
+                customerId={selectedCustomerId}
+                onClose={() => setShowEditForm(false)}
+                onUpdated={() => {
+                  toast.success('Customer updated!');
+                  setShowEditForm(false);
+                }}
+              />
+            )}
+          </>
         ) : (
           <p>Select a customer from the sidebar to view their statement.</p>
         )}
