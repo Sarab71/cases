@@ -29,7 +29,7 @@ public class CustomerService {
                 .name(requestDto.getName())
                 .phone(requestDto.getPhone())
                 .address(requestDto.getAddress())
-                .balance(requestDto.getBalance())
+                .balance(0)
                 .build();
 
         Customer savedCustomer = customerRepository.save(customer);
@@ -56,7 +56,6 @@ public class CustomerService {
         customer.setName(requestDto.getName());
         customer.setPhone(requestDto.getPhone());
         customer.setAddress(requestDto.getAddress());
-        customer.setBalance(requestDto.getBalance());
 
         Customer updatedCustomer = customerRepository.save(customer);
         return convertToResponseDto(updatedCustomer);
