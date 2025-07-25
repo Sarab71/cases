@@ -46,7 +46,6 @@ export default function CustomersPage() {
                 customerId={selectedCustomerId}
                 onClose={() => setShowEditForm(false)}
                 onUpdated={() => {
-                  toast.success('Customer updated!');
                   setShowEditForm(false);
                 }}
               />
