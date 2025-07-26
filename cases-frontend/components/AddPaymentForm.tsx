@@ -16,7 +16,7 @@ export default function AddPaymentForm() {
   const [selectedCustomer, setSelectedCustomer] = useState<Customer | null>(null);
   const [amount, setAmount] = useState<string>('');
   const [description, setDescription] = useState<string>('');
-  const [date, setDate] = useState<string>(() => new Date().toISOString().slice(0, 16));
+  const [date, setDate] = useState<string>(() => new Date().toISOString().slice(0, 10));
   const searchRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
@@ -85,7 +85,7 @@ export default function AddPaymentForm() {
           customerId: selectedCustomer.id,
           amount: Number(amount),
           description,
-          date: new Date(date).toISOString(), // full ISO format
+          date: new Date(date + 'T00:00').toISOString(), // full ISO format
         }),
       });
 
@@ -161,7 +161,7 @@ export default function AddPaymentForm() {
       <div>
         <label className="block font-medium">Date & Time</label>
         <input
-          type="datetime-local"
+          type="date"
           value={date}
           onChange={(e) => setDate(e.target.value)}
           className="w-full border rounded p-2"
