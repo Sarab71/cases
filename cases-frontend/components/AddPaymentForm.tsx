@@ -95,7 +95,7 @@ export default function AddPaymentForm() {
         setSearchTerm('');
         setAmount('');
         setDescription('');
-        setDate(new Date().toISOString().slice(0, 16));
+        setDate(new Date().toISOString().slice(0, 10));
       } else {
         const data = await response.json();
         toast.error(data.message || 'Failed to add payment.');
