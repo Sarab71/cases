@@ -9,14 +9,24 @@ export default function LoginForm() {
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
 
-  const handleLogin = async () => {
-    if (username === process.env.NEXT_PUBLIC_LOGIN_USERNAME && password === process.env.NEXT_PUBLIC_LOGIN_PASSWORD) {
-      document.cookie = 'auth=true; path=/';
-      window.location.href = '/';
-    } else {
-      setError('Invalid credentials');
-    }
-  };
+const handleLogin = async () => {
+  const res = await fetch('/api/login', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({ username, password }),
+  });
+
+  const data = await res.json();
+
+  if (data.success) {
+    window.location.href = '/';
+  } else {
+    setError('Invalid credentials');
+  }
+};
+
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-100 px-4">
