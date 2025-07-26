@@ -233,7 +233,7 @@ export default function EditBillForm({ billId, onClose, onUpdated }: EditBillFor
                   <button
                     type="button"
                     onClick={() => handleDeleteItem(index)}
-                    className="bg-red-500 text-white px-2 py-1 rounded"
+                    className="bg-red-500 text-white px-2 py-1 rounded hover:cursor-pointer"
                   >
                     Delete
                   </button>
@@ -245,10 +245,10 @@ export default function EditBillForm({ billId, onClose, onUpdated }: EditBillFor
       </div>
 
       <div className="flex flex-wrap gap-2 justify-end">
-        <button type="submit" className="bg-green-600 text-white px-3 py-1 rounded">Update Bill</button>
-        <button type="button" onClick={onClose} className="bg-gray-500 text-white px-3 py-1 rounded">Cancel</button>
-        <button type="button" onClick={handleDeleteBill} className="bg-red-600 text-white px-3 py-1 rounded">Delete Bill</button>
-        <button type="button" onClick={downloadPdf} className="bg-blue-600 text-white px-3 py-1 rounded">Export as PDF</button>
+        <button type="submit" className="bg-green-600 text-white px-3 py-1 rounded hover:cursor-pointer">Update Bill</button>
+        <button type="button" onClick={onClose} className="bg-gray-500 text-white px-3 py-1 rounded hover:cursor-pointer">Cancel</button>
+        <button type="button" onClick={handleDeleteBill} className="bg-red-600 text-white px-3 py-1 rounded hover:cursor-pointer">Delete Bill</button>
+        <button type="button" onClick={downloadPdf} className="bg-blue-600 text-white px-3 py-1 rounded hover:cursor-pointer">Export as PDF</button>
       </div>
     </form>
   );

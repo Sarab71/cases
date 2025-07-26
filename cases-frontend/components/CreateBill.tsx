@@ -354,7 +354,7 @@ export default function CreateBillForm() {
         <button
           type="button"
           onClick={handleAddItem}
-          className="bg-blue-500 text-white py-1 px-3 rounded hover:bg-blue-600"
+          className="bg-blue-500 text-white py-1 px-3 rounded hover:bg-blue-600 cursor-pointer"
         >
           + Add Item
         </button>
@@ -365,10 +365,10 @@ export default function CreateBillForm() {
       </div>
 
       <div className="flex gap-2 justify-end">
-        <button type="submit" className="bg-green-600 text-white py-2 px-4 rounded hover:bg-green-700">
+        <button type="submit" className="bg-green-600 text-white py-2 px-4 rounded hover:bg-green-700 cursor-pointer">
           Create Bill
         </button>
-        <button type="button" onClick={downloadPdf} className="bg-blue-600 text-white py-2 px-4 rounded hover:bg-blue-700">
+        <button type="button" onClick={downloadPdf} className="bg-blue-600 text-white py-2 px-4 rounded hover:bg-blue-700 cursor-pointer">
           Export as PDF
         </button>
       </div>
