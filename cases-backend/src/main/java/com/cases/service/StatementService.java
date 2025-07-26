@@ -1,16 +1,21 @@
 package com.cases.service;
 
+import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+
+import org.springframework.stereotype.Service;
+
 import com.cases.dto.StatementTransactionDTO;
 import com.cases.model.Bill;
 import com.cases.model.Transaction;
 import com.cases.repository.BillRepository;
 import com.cases.repository.TransactionRepository;
-import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
 
-import java.math.BigDecimal;
-import java.util.*;
-import java.util.stream.Collectors;
+import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor

@@ -1,18 +1,20 @@
 package com.cases.service;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.List;
+import java.util.stream.Collectors;
+
+import org.springframework.beans.BeanUtils;
+import org.springframework.stereotype.Service;
+
 import com.cases.dto.CustomerRequestDto;
 import com.cases.dto.CustomerResponseDto;
 import com.cases.dto.OutstandingResponseDto;
 import com.cases.model.Customer;
 import com.cases.repository.CustomerRepository;
-import lombok.RequiredArgsConstructor;
-import org.springframework.beans.BeanUtils;
-import org.springframework.stereotype.Service;
 
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.util.List;
-import java.util.stream.Collectors;
+import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor

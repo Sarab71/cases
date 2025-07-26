@@ -1,7 +1,8 @@
 package com.cases.dto;
 
-import lombok.Data;
 import java.time.LocalDateTime;
+
+import lombok.Data;
 
 @Data
 public class CustomerResponseDto {

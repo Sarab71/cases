@@ -1,9 +1,10 @@
 package com.cases.repository;
 
-import com.cases.model.ExpenseCategory;
+import java.util.Optional;
+
 import org.springframework.data.mongodb.repository.MongoRepository;
 
-import java.util.Optional;
+import com.cases.model.ExpenseCategory;
 
 public interface ExpenseCategoryRepository extends MongoRepository<ExpenseCategory, String> {
     Optional<ExpenseCategory> findByCategory(String category);
