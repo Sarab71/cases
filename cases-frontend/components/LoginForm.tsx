@@ -12,7 +12,7 @@ export default function LoginForm() {
   const handleLogin = async () => {
     if (username === process.env.NEXT_PUBLIC_LOGIN_USERNAME && password === process.env.NEXT_PUBLIC_LOGIN_PASSWORD) {
       document.cookie = 'auth=true; path=/';
-      router.push('/');
+      window.location.href = '/';
     } else {
       setError('Invalid credentials');
     }
