@@ -2,7 +2,6 @@
 
 import { useEffect, useState, ChangeEvent, KeyboardEvent, FormEvent } from 'react';
 import { toast } from 'react-toastify';
-import { createBill } from '@/lib/bills';
 import axios from '@/lib/axios';
 
 interface Item {
@@ -129,45 +128,58 @@ export default function CreateBillForm() {
     setGrandTotal(0);
   };
 
-  const handleSubmit = async (e: FormEvent) => {
-    e.preventDefault();
-    if (!selectedCustomer) {
-      toast.error('Please select a customer before creating the bill');
-      return;
-    }
+const handleSubmit = async (e: FormEvent) => {
+  e.preventDefault();
+  if (!selectedCustomer) {
+    toast.error('Please select a customer before creating the bill');
+    return;
+  }
 
-    // ✅ Process items to include totalAmount
-    const processedItems = items.map((item) => {
-      const quantity = Number(item.quantity) || 0;
-      const rate = Number(item.rate) || 0;
-      const discount = Number(item.discount) || 0;
-      const discountAmount = (rate * discount) / 100;
-      const netPrice = rate - discountAmount;
-      const totalAmount = netPrice * quantity;
+  // ✅ Calculate totalAmount per item
+  const processedItems = items.map((item) => {
+    const quantity = Number(item.quantity) || 0;
+    const rate = Number(item.rate) || 0;
+    const discount = Number(item.discount) || 0;
+    const discountAmount = (rate * discount) / 100;
+    const netPrice = rate - discountAmount;
+    const totalAmount = netPrice * quantity;
 
-      return {
-        ...item,
-        totalAmount: Number(totalAmount.toFixed(2)),
-      };
-    });
+    return {
+      ...item,
+      totalAmount: Number(totalAmount.toFixed(2)),
+    };
+  });
 
-    try {
-      await createBill(selectedCustomer.id, {
-        invoiceNumber,
-        date: billDate,
-        items: processedItems,
-        grandTotal,
-      });
-
-      toast.success('Bill created successfully');
-      resetForm();
-      setBillDate(new Date().toISOString().split('T')[0]);
-      await fetchNextInvoiceNumber();
-    } catch (err) {
-      console.error(err);
-      toast.error('Failed to create bill');
-    }
+  const payload = {
+    invoiceNumber,
+    date: billDate,
+    items: processedItems,
+    grandTotal,
   };
+
+  try {
+    await axios.post(
+      `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/bills`,
+      payload,
+      {
+        params: {
+          customerId: selectedCustomer.id,
+        },
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      }
+    );
+
+    toast.success('Bill created successfully');
+    resetForm();
+    setBillDate(new Date().toISOString().split('T')[0]);
+    await fetchNextInvoiceNumber();
+  } catch (err) {
+    console.error(err);
+    toast.error('Failed to create bill');
+  }
+};
 
   const downloadPdf = async () => {
     if (!selectedCustomer) {
