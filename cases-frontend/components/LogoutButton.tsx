@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import Spinner from '@/components/Spinner'; // adjust the path if needed
 
 export default function LogoutButton() {
   const router = useRouter();
@@ -20,19 +21,15 @@ export default function LogoutButton() {
   };
 
   return (
-    <button
-      onClick={handleLogout}
-      disabled={loading}
-      className="text-white hover:cursor-pointer hover:underline flex items-center gap-2"
-    >
-      {loading ? (
-        <>
-          <span className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
-          Logging out...
-        </>
-      ) : (
-        'Logout'
-      )}
-    </button>
+    <>
+      {loading && <Spinner />}
+      <button
+        onClick={handleLogout}
+        disabled={loading}
+        className="text-white hover:cursor-pointer hover:underline"
+      >
+        Logout
+      </button>
+    </>
   );
 }
