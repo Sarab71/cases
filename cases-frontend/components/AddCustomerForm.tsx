@@ -1,6 +1,7 @@
 'use client';
 import { useState } from 'react';
 import { toast } from 'react-toastify';
+import axios from '@/lib/axios';
 
 export default function AddCustomerForm() {
   const [name, setName] = useState('');
@@ -11,23 +12,19 @@ export default function AddCustomerForm() {
     e.preventDefault();
 
     try {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/customers`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name, phone, address }),
+      const response = await axios.post('/customers', {
+        name,
+        phone,
+        address,
       });
 
-      if (response.ok) {
-        toast.success('Customer added successfully!');
-        setName('');
-        setPhone('');
-        setAddress('');
-      } else {
-        const data = await response.json();
-        toast.error(data.message || 'Failed to add customer.');
-      }
-    } catch (err) {
-      toast.error('Something went wrong.');
+      toast.success('Customer added successfully!');
+      setName('');
+      setPhone('');
+      setAddress('');
+    } catch (err: any) {
+      const message = err.response?.data?.message || 'Something went wrong.';
+      toast.error(message);
     }
   };
 

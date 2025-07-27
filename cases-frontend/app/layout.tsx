@@ -1,7 +1,14 @@
 import "./globals.css";
 import Header from '@/components/Header';
+import Spinner from '@/components/Spinner';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import { LoadingProvider, useLoading } from '@/context/LoadingContext';
+
+function GlobalSpinner() {
+  const { loading } = useLoading();
+  return loading ? <Spinner /> : null;
+}
 
 export default function RootLayout({
   children,
@@ -11,11 +18,14 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body>
-        <Header />
-        <main className="p-4">
-          {children}
-        </main>
-        <ToastContainer position="top-right" autoClose={1500} />
+        <LoadingProvider>
+          <GlobalSpinner />
+          <Header />
+          <main className="p-4">
+            {children}
+          </main>
+          <ToastContainer position="top-right" autoClose={1500} />
+        </LoadingProvider>
       </body>
     </html>
   );
