@@ -9,7 +9,7 @@ export default function CustomersPage() {
   const [selectedCustomerId, setSelectedCustomerId] = useState<string | null>(null);
   const [selectedCustomerName, setSelectedCustomerName] = useState<string>('');
   const [showEditForm, setShowEditForm] = useState(false);
-   const [refreshCustomerList, setRefreshCustomerList] = useState<number>(0);
+  const [refreshCustomerList, setRefreshCustomerList] = useState<number>(0);
 
   const handleSelectCustomer = (customerId: string, customerName: string) => {
     setSelectedCustomerId(customerId);
@@ -20,7 +20,7 @@ export default function CustomersPage() {
   return (
     <div className="flex">
       <CustomerSideBar onSelectCustomer={handleSelectCustomer}
-       refreshTrigger={refreshCustomerList} />
+        refreshTrigger={refreshCustomerList} />
 
       <div className="flex-1 p-4 ml-64">
         <div className="flex justify-between items-center mb-4">
@@ -46,7 +46,8 @@ export default function CustomersPage() {
               <EditCustomerForm
                 customerId={selectedCustomerId}
                 onClose={() => setShowEditForm(false)}
-                onUpdated={() => {
+                onUpdated={(updatedName) => {
+                  setSelectedCustomerName(updatedName);
                   setRefreshCustomerList(prev => prev + 1);
                   setShowEditForm(false);
                 }}

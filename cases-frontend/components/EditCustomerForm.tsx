@@ -13,7 +13,7 @@ interface Customer {
 interface EditCustomerFormProps {
   customerId: string;
   onClose: () => void;
-  onUpdated: () => void;
+  onUpdated: (updatedName: string) => void;
 }
 
 export default function EditCustomerForm({ customerId, onClose, onUpdated }: EditCustomerFormProps) {
@@ -58,7 +58,7 @@ export default function EditCustomerForm({ customerId, onClose, onUpdated }: Edi
 
       if (res.ok) {
         toast.success('Customer updated successfully!');
-        onUpdated();
+        onUpdated(name);
         onClose();
       } else {
         const data = await res.json();
