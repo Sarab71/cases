@@ -37,10 +37,6 @@ export default function CustomersPage() {
 
         {selectedCustomerId ? (
           <>
-            <CustomerStatement
-              customerId={selectedCustomerId}
-              customerName={selectedCustomerName}
-            />
 
             {showEditForm && (
               <EditCustomerForm
@@ -53,6 +49,11 @@ export default function CustomersPage() {
                 }}
               />
             )}
+            
+            <CustomerStatement
+              customerId={selectedCustomerId}
+              customerName={selectedCustomerName}
+            />
           </>
         ) : (
           <p>Select a customer from the sidebar to view their statement.</p>
