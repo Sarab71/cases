@@ -1,4 +1,4 @@
-import React from 'react'
+import React from 'react' 
 import CategoryWiseExpenses from '@/components/CategoryWiseExpenses'
 const page = () => {
   return (
