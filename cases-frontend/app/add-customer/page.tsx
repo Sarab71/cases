@@ -1,3 +1,4 @@
+'use client';
 import AddCustomerForm from '@/components/AddCustomerForm';
 
 export default function Page() {
