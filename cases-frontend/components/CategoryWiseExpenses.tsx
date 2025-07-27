@@ -65,7 +65,7 @@ export default function ExpensesList() {
                         <h3 className="text-lg font-semibold">{category.category}</h3>
                         <button
                             onClick={() => handleDeleteCategory(category.category)}
-                            className="text-red-600 text-sm hover:underline"
+                            className="text-red-600 text-sm hover:underline cursor-pointer"
                         >
                             Delete Category
                         </button>

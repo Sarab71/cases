@@ -28,7 +28,7 @@ export default function CustomersPage() {
           {selectedCustomerId && (
             <button
               onClick={() => setShowEditForm(!showEditForm)}
-              className="bg-blue-600 text-white px-3 py-1 rounded"
+              className="bg-blue-600 text-white px-3 py-1 rounded hover:cursor-pointer"
             >
               {showEditForm ? 'Close Edit' : 'Edit'}
             </button>

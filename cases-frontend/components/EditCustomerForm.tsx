@@ -109,8 +109,8 @@ export default function EditCustomerForm({ customerId, onClose, onUpdated }: Edi
       </div>
 
       <div className="flex justify-end gap-2">
-        <button type="submit" className="bg-green-600 text-white px-3 py-1 rounded">Update</button>
-        <button type="button" onClick={onClose} className="bg-gray-500 text-white px-3 py-1 rounded">Cancel</button>
+        <button type="submit" className="bg-green-600 text-white px-3 py-1 rounded hover:cursor-pointer">Update</button>
+        <button type="button" onClick={onClose} className="bg-gray-500 text-white px-3 py-1 rounded hover:cursor-pointer">Cancel</button>
       </div>
     </form>
   );
