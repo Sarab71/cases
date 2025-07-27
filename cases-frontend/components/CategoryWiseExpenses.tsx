@@ -1,6 +1,9 @@
 'use client';
 
+import axios from '@/lib/axios';
 import { useEffect, useState } from 'react';
+import { toast } from 'react-toastify';
+
 
 interface Expense {
     id: string;
@@ -19,36 +22,39 @@ export default function ExpensesList() {
     const [categories, setCategories] = useState<Category[]>([]);
 
     const fetchExpenses = async () => {
-        const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/expenses`);
-        if (res.ok) {
-            const data = await res.json();
-            setCategories(data);
+        try {
+            const res = await axios.get('/expenses');
+            setCategories(res.data);
+        } catch (err: any) {
+            toast.error('Failed to load expenses.');
         }
     };
 
     const handleDelete = async (category: string, index: number) => {
         if (!confirm('Are you sure you want to delete this expense?')) return;
 
-        const params = new URLSearchParams({ category, index: index.toString() });
-        const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/expenses?${params.toString()}`, {
-            method: 'DELETE',
-        });
+        try {
+            await axios.delete('/expenses', {
+                params: { category, index }
+            });
 
-        if (res.ok) {
-            fetchExpenses();  // Refresh list after delete
+            fetchExpenses(); // Refresh list after delete
+        } catch (err: any) {
+            toast.error('Failed to delete expense.');
         }
     };
 
     const handleDeleteCategory = async (category: string) => {
         if (!confirm(`Delete entire category "${category}"? This cannot be undone.`)) return;
 
-        const params = new URLSearchParams({ category });
-        const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/expenses/category?${params}`, {
-            method: 'DELETE',
-        });
+        try {
+            await axios.delete('/expenses/category', {
+                params: { category }
+            });
 
-        if (res.ok) {
-            fetchExpenses();  // Refresh list after category delete
+            fetchExpenses(); // Refresh list after category delete
+        } catch (err: any) {
+            toast.error('Failed to delete category.');
         }
     };
 

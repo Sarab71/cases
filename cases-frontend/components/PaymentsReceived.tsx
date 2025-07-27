@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import axios from '@/lib/axios';
 
 interface PaymentsReceivedProps {
     startDate?: string;
@@ -21,18 +22,17 @@ export default function PaymentsReceived({ startDate = '', endDate = '' }: Payme
 
             if (endDate) {
                 const end = new Date(endDate);
-                end.setHours(23, 59, 59, 999); // ✅ full end of day
+                end.setHours(23, 59, 59, 999);
                 params.append('endDate', end.toISOString());
             }
 
             console.log('🔍 Params:', params.toString());
 
-            const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/payments/total?${params.toString()}`);
-            if (res.ok) {
-                const data = await res.json();
-                setTotal(data.totalPayment); // ✅ fixed key
-            } else {
-                console.error('API failed:', res.status);
+            try {
+                const res = await axios.get(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/payments/total?${params.toString()}`);
+                setTotal(res.data.totalPayment); // ✅ fixed key
+            } catch (err) {
+                console.error('API failed:', err);
             }
         }
 

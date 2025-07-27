@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef, ChangeEvent, KeyboardEvent, FormEvent } from 'react';
 import { toast } from 'react-toastify';
+import axios from '@/lib/axios';
 
 interface Customer {
   id: string;
@@ -19,16 +20,17 @@ export default function AddPaymentForm() {
   const [date, setDate] = useState<string>(() => new Date().toISOString().slice(0, 10));
   const searchRef = useRef<HTMLInputElement>(null);
 
+
   useEffect(() => {
     const fetchCustomers = async () => {
       try {
-        const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/customers`);
-        const data: Customer[] = await res.json();
-        setCustomers(data);
-      } catch {
+        const res = await axios.get<Customer[]>('/customers'); // baseURL already set
+        setCustomers(res.data);
+      } catch (err) {
         toast.error('Failed to load customers.');
       }
     };
+
     fetchCustomers();
   }, []);
 
@@ -69,6 +71,7 @@ export default function AddPaymentForm() {
     setFilteredCustomers([]);
   };
 
+
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
 
@@ -78,30 +81,22 @@ export default function AddPaymentForm() {
     }
 
     try {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/payments`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          customerId: selectedCustomer.id,
-          amount: Number(amount),
-          description,
-          date: new Date(date + 'T00:00').toISOString(), // full ISO format
-        }),
+      await axios.post('/payments', {
+        customerId: selectedCustomer.id,
+        amount: Number(amount),
+        description,
+        date: new Date(date + 'T00:00').toISOString(),
       });
 
-      if (response.ok) {
-        toast.success('Payment added successfully!');
-        setSelectedCustomer(null);
-        setSearchTerm('');
-        setAmount('');
-        setDescription('');
-        setDate(new Date().toISOString().slice(0, 10));
-      } else {
-        const data = await response.json();
-        toast.error(data.message || 'Failed to add payment.');
-      }
-    } catch {
-      toast.error('Something went wrong.');
+      toast.success('Payment added successfully!');
+      setSelectedCustomer(null);
+      setSearchTerm('');
+      setAmount('');
+      setDescription('');
+      setDate(new Date().toISOString().slice(0, 10));
+    } catch (err: any) {
+      const message = err.response?.data?.message || 'Failed to add payment.';
+      toast.error(message);
     }
   };
 

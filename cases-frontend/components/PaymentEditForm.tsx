@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { toast } from 'react-toastify';
+import axios from '@/lib/axios';
 
 interface Payment {
     id: string;
@@ -25,18 +26,14 @@ export default function PaymentEditForm({ paymentId, onClose, onUpdated }: Payme
     useEffect(() => {
         const fetchPayment = async () => {
             try {
-                const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/payments/${paymentId}`);
-                if (res.ok) {
-                    const data = await res.json();
-                    setPayment(data);
-                    setEditAmount(data.amount.toString());
-                    setEditDate(data.date ? data.date.split('T')[0] : '');
-                } else {
-                    toast.error('Failed to load payment details.');
-                }
+                const res = await axios.get(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/payments/${paymentId}`);
+                const data = res.data;
+                setPayment(data);
+                setEditAmount(data.amount.toString());
+                setEditDate(data.date ? data.date.split('T')[0] : '');
             } catch (err) {
                 console.error(err);
-                toast.error('Error fetching payment details.');
+                toast.error('Failed to load payment details.');
             } finally {
                 setLoading(false);
             }
@@ -45,6 +42,7 @@ export default function PaymentEditForm({ paymentId, onClose, onUpdated }: Payme
         fetchPayment();
     }, [paymentId]);
 
+
     const handleDelete = async () => {
         if (!payment) return;
 
@@ -52,48 +50,35 @@ export default function PaymentEditForm({ paymentId, onClose, onUpdated }: Payme
         if (!confirmDelete) return;
 
         try {
-            const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/payments/${paymentId}`, {
-                method: 'DELETE'
-            });
-
-            if (res.ok) {
-                toast.success('Payment deleted successfully!');
-                onUpdated();
-                onClose();
-            } else {
-                toast.error('Failed to delete payment.');
-            }
+            await axios.delete(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/payments/${paymentId}`);
+            toast.success('Payment deleted successfully!');
+            onUpdated();
+            onClose();
         } catch (err) {
             console.error(err);
-            toast.error('Error deleting payment.');
+            toast.error('Failed to delete payment.');
         }
     };
+
 
     const handleUpdate = async (e: React.FormEvent) => {
         e.preventDefault();
         if (!payment) return;
 
-        const isoDate = new Date(editDate).toISOString(); // <- ✅ FIXED HERE
+        const isoDate = new Date(editDate).toISOString();
 
         try {
-            const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/payments/${paymentId}`, {
-                method: 'PATCH',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    amount: Number(editAmount),
-                    date: isoDate, // <-- use ISO date format here
-                }),
+            await axios.patch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/payments/${paymentId}`, {
+                amount: Number(editAmount),
+                date: isoDate,
             });
 
-            if (res.ok) {
-                toast.success('Payment updated successfully!');
-                onUpdated();
-                onClose();
-            } else {
-                toast.error('Failed to update payment.');
-            }
+            toast.success('Payment updated successfully!');
+            onUpdated();
+            onClose();
         } catch (err) {
-            toast.error('Error updating payment.');
+            console.error(err);
+            toast.error('Failed to update payment.');
         }
     };
 

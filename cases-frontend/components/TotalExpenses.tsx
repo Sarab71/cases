@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import axios from '@/lib/axios';
 
 interface TotalExpensesProps {
     startDate?: string;
@@ -28,14 +29,10 @@ export default function TotalExpenses({ startDate = '', endDate = '' }: TotalExp
             console.log('🔍 Params:', params.toString());
 
             try {
-                const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/expenses/total?${params.toString()}`);
-                if (res.ok) {
-                    const data = await res.json();
-                    setTotal(data.totalExpenses); // ✅ correct key
-                } else {
-                    console.error('API failed:', res.status);
-                    setTotal(null);
-                }
+                const res = await axios.get(
+                    `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/expenses/total?${params.toString()}`
+                );
+                setTotal(res.data.totalExpenses); // ✅ correct key
             } catch (error) {
                 console.error('Fetch error:', error);
                 setTotal(null);
@@ -47,7 +44,7 @@ export default function TotalExpenses({ startDate = '', endDate = '' }: TotalExp
 
     return (
         <div className="p-4 bg-white rounded shadow mb-4">
-            <h3 className="font-semibold mb-2">Expenses</h3> 
+            <h3 className="font-semibold mb-2">Expenses</h3>
             <div className="text-2xl font-bold text-orange-600">
                 ₹ {typeof total === 'number' ? total.toLocaleString() : '...'}
             </div>

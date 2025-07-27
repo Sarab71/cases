@@ -2,6 +2,7 @@
 
 import { useEffect, useState, useRef } from 'react';
 import { toast } from 'react-toastify';
+import axios from '@/lib/axios';
 
 interface Expense {
   description: string;
@@ -34,10 +35,11 @@ export default function ExpenseForm() {
       }
 
       try {
-        const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/expenses/categories?query=${encodeURIComponent(category)}`);
-        if (!res.ok) throw new Error("Failed to fetch suggestions");
+        const res = await axios.get(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/expenses/categories`, {
+          params: { query: category },
+        });
 
-        const data: CategorySuggestion[] = await res.json();
+        const data: CategorySuggestion[] = res.data;
         setSuggestions(data);
       } catch (err) {
         console.error("Error fetching suggestions:", err);
@@ -101,23 +103,18 @@ export default function ExpenseForm() {
 
     if (date) payload.date = date;
 
-    if (date) payload.date = date;
+    try {
+      await axios.post(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/expenses`, payload);
 
-    const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/expenses`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(payload),
-    });
-
-    setLoading(false);
-
-    if (res.ok) {
       setDescription('');
       setAmount('');
       setDate('');
       toast.success('Expense added!');
-    } else {
+    } catch (error) {
+      console.error("Error adding expense:", error);
       toast.error('Failed to add expense');
+    } finally {
+      setLoading(false);
     }
   };
 

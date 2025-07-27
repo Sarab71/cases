@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { toast } from 'react-toastify';
+import axios from '@/lib/axios';
 
 interface Item {
   modelNumber: string;
@@ -39,19 +40,18 @@ export default function EditBillForm({ billId, onClose, onUpdated }: EditBillFor
 
   useEffect(() => {
     const fetchBill = async () => {
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/bills/${billId}`);
-      if (res.ok) {
-        const data = await res.json();
+      try {
+        const res = await axios.get(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/bills/${billId}`);
+        const data = res.data;
         setBill(data);
         setItems(data.items);
         setEditDate(data.date ? data.date.split('T')[0] : '');
 
         // Fetch customer
-        const custRes = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/customers/${data.customerId}`);
-        if (custRes.ok) {
-          const custData = await custRes.json();
-          setCustomer(custData);
-        }
+        const custRes = await axios.get(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/customers/${data.customerId}`);
+        setCustomer(custRes.data);
+      } catch (error) {
+        console.error('Failed to fetch bill or customer:', error);
       }
     };
 
@@ -81,41 +81,41 @@ export default function EditBillForm({ billId, onClose, onUpdated }: EditBillFor
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
     const updatedItems = items.map((item) => {
       const totalAmount = calculateTotalAmount(item);
       return { ...item, totalAmount };
     });
+
     const grandTotal = updatedItems.reduce((sum, item) => sum + item.totalAmount!, 0);
 
-    const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/bills/${billId}`, {
-      method: 'PATCH',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
+    try {
+      await axios.patch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/bills/${billId}`, {
         date: editDate,
         items: updatedItems,
-        grandTotal
-      }),
-    });
+        grandTotal,
+      });
 
-    if (res.ok) {
       toast.success('Bill updated successfully!');
       onClose();
       onUpdated();
-    } else {
+    } catch (error) {
+      console.error('❌ Failed to update bill:', error);
       toast.error('Failed to update bill.');
     }
   };
 
+
   const handleDeleteBill = async () => {
     if (!confirm('Are you sure you want to delete this bill?')) return;
-    const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/bills/${billId}`, {
-      method: 'DELETE',
-    });
-    if (res.ok) {
+
+    try {
+      await axios.delete(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/bills/${billId}`);
       toast.success('Bill deleted successfully!');
       onClose();
       onUpdated();
-    } else {
+    } catch (error) {
+      console.error('❌ Failed to delete bill:', error);
       toast.error('Failed to delete bill.');
     }
   };
@@ -133,27 +133,29 @@ export default function EditBillForm({ billId, onClose, onUpdated }: EditBillFor
 
     const grandTotal = processedItems.reduce((sum, item) => sum + item.totalAmount!, 0);
 
-    const res = await fetch(`${process.env.NEXT_PUBLIC_PDF_API_URL}/generate-pdf`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        invoiceNumber: bill.invoiceNumber,
-        customer,
-        items: processedItems,
-        grandTotal,
-        date: new Date(editDate).toLocaleDateString(),
-      }),
-    });
+    try {
+      const response = await axios.post(
+        `${process.env.NEXT_PUBLIC_PDF_API_URL}/generate-pdf`,
+        {
+          invoiceNumber: bill.invoiceNumber,
+          customer,
+          items: processedItems,
+          grandTotal,
+          date: new Date(editDate).toLocaleDateString(),
+        },
+        {
+          responseType: 'blob', // Important for handling file download
+        }
+      );
 
-    if (res.ok) {
-      const blob = await res.blob();
-      const url = window.URL.createObjectURL(blob);
+      const url = window.URL.createObjectURL(response.data);
       const a = document.createElement('a');
       a.href = url;
       a.download = `Invoice_${bill.invoiceNumber}.pdf`;
       a.click();
       window.URL.revokeObjectURL(url);
-    } else {
+    } catch (error) {
+      console.error('❌ Failed to generate PDF:', error);
       toast.error('Failed to generate PDF');
     }
   };

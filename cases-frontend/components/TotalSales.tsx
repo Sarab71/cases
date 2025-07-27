@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import axios from '@/lib/axios';
 
 interface TotalSalesProps {
     startDate?: string;
@@ -27,12 +28,13 @@ export default function TotalSales({ startDate = '', endDate = '' }: TotalSalesP
 
             console.log('🔍 Params:', params.toString()); // debug line
 
-            const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/sales/total?${params.toString()}`);
-            if (res.ok) {
-                const data = await res.json();
-                setTotal(data.totalSales);
-            } else {
-                console.error('API failed:', res.status);
+            try {
+                const res = await axios.get(
+                    `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/sales/total?${params.toString()}`
+                );
+                setTotal(res.data.totalSales);
+            } catch (error) {
+                console.error('API failed:', error);
             }
         }
 

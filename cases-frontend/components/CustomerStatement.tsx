@@ -3,6 +3,7 @@
 import { useEffect, useState, useCallback } from 'react';
 import EditBillForm from '@/components/EditBillForm'; // Adjust the import path if needed
 import PaymentEditForm from '@/components/PaymentEditForm';
+import axios from '@/lib/axios';
 
 interface Transaction {
     id: string;
@@ -32,11 +33,8 @@ export default function CustomerStatement({ customerId, customerName }: Props) {
     const fetchTransactions = useCallback(async () => {
         setLoading(true);
         try {
-            const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/customers/${customerId}/statement`);
-            if (res.ok) {
-                const data = await res.json();
-                setTransactions(data);
-            }
+            const res = await axios.get(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/customers/${customerId}/statement`);
+            setTransactions(res.data);
         } catch (err) {
             console.error('Failed to fetch transactions', err);
         } finally {
@@ -94,13 +92,12 @@ export default function CustomerStatement({ customerId, customerName }: Props) {
                                     <tr key={txn.id || index}>
                                         <td className="border p-2">{date}</td>
                                         <td
-                                            className={`border p-2 ${
-                                                txn.relatedBillId
+                                            className={`border p-2 ${txn.relatedBillId
                                                     ? 'text-blue-600 cursor-pointer hover:underline'
                                                     : isPayment
-                                                    ? 'text-green-600 cursor-pointer hover:underline'
-                                                    : ''
-                                            }`}
+                                                        ? 'text-green-600 cursor-pointer hover:underline'
+                                                        : ''
+                                                }`}
                                             onClick={() => {
                                                 if (txn.relatedBillId) {
                                                     handleInvoiceClick(txn.relatedBillId);
@@ -112,8 +109,8 @@ export default function CustomerStatement({ customerId, customerName }: Props) {
                                             {txn.invoiceNumber
                                                 ? `Invoice #${txn.invoiceNumber}`
                                                 : isPayment
-                                                ? txn.description || txn.particulars || 'Payment'
-                                                : txn.particulars}
+                                                    ? txn.description || txn.particulars || 'Payment'
+                                                    : txn.particulars}
                                         </td>
                                         <td className="border p-2 text-right">{debit}</td>
                                         <td className="border p-2 text-right">{credit}</td>

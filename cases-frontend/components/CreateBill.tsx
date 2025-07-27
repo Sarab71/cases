@@ -3,6 +3,7 @@
 import { useEffect, useState, ChangeEvent, KeyboardEvent, FormEvent } from 'react';
 import { toast } from 'react-toastify';
 import { createBill } from '@/lib/bills';
+import axios from '@/lib/axios';
 
 interface Item {
   modelNumber: string;
@@ -30,9 +31,8 @@ export default function CreateBillForm() {
 
   const fetchNextInvoiceNumber = async () => {
     try {
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/bills/next-invoice-number`);
-      const number = await res.json();
-      setInvoiceNumber(number);
+      const res = await axios.get('/bills/next-invoice-number');
+      setInvoiceNumber(res.data);
     } catch (err) {
       console.error('Failed to fetch invoice number', err);
     }
@@ -46,17 +46,12 @@ export default function CreateBillForm() {
     fetchCustomers();
   }, []);
 
+
   const fetchCustomers = async () => {
     try {
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/customers`);
-
-      if (!res.ok) {
-        throw new Error(`Failed to fetch customers: ${res.status}`);
-      }
-
-      const data: Customer[] = await res.json();
-      setCustomers(data);
-      console.log("✅ Customers fetched:", data);
+      const res = await axios.get<Customer[]>('/customers');
+      setCustomers(res.data);
+      console.log("✅ Customers fetched:", res.data);
     } catch (error) {
       console.error("❌ Error fetching customers:", error);
     }
@@ -174,14 +169,12 @@ export default function CreateBillForm() {
     }
   };
 
-
   const downloadPdf = async () => {
     if (!selectedCustomer) {
       toast.error('Please select customer first');
       return;
     }
 
-    // ✅ Process items to include totalAmount
     const processedItems = items.map((item) => {
       const quantity = Number(item.quantity) || 0;
       const rate = Number(item.rate) || 0;
@@ -196,27 +189,29 @@ export default function CreateBillForm() {
       };
     });
 
-    const res = await fetch(`${process.env.NEXT_PUBLIC_PDF_API_URL}/generate-pdf`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        invoiceNumber,
-        customer: selectedCustomer,
-        items: processedItems, // ✅ now totalAmount is included
-        grandTotal,
-        date: new Date().toLocaleDateString(),
-      }),
-    });
+    try {
+      const res = await axios.post(
+        `${process.env.NEXT_PUBLIC_PDF_API_URL}/generate-pdf`,
+        {
+          invoiceNumber,
+          customer: selectedCustomer,
+          items: processedItems,
+          grandTotal,
+          date: new Date().toLocaleDateString(),
+        },
+        {
+          responseType: 'blob',
+        }
+      );
 
-    if (res.ok) {
-      const blob = await res.blob();
-      const url = window.URL.createObjectURL(blob);
+      const url = window.URL.createObjectURL(res.data);
       const a = document.createElement('a');
       a.href = url;
       a.download = `Invoice_${invoiceNumber}.pdf`;
       a.click();
       window.URL.revokeObjectURL(url);
-    } else {
+    } catch (err) {
+      console.error(err);
       toast.error('Failed to generate PDF');
     }
   };

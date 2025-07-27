@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { toast } from 'react-toastify';
+import axios from '@/lib/axios';
 
 interface Customer {
   id: string;
@@ -26,17 +27,14 @@ export default function EditCustomerForm({ customerId, onClose, onUpdated }: Edi
   useEffect(() => {
     const fetchCustomer = async () => {
       try {
-        const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/customers/${customerId}`);
-        if (res.ok) {
-          const data = await res.json();
-          setCustomer(data);
-          setName(data.name);
-          setPhone(data.phone);
-          setAddress(data.address);
-        } else {
-          toast.error('Failed to load customer.');
-        }
+        const res = await axios.get(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/customers/${customerId}`);
+        const data = res.data;
+        setCustomer(data);
+        setName(data.name);
+        setPhone(data.phone);
+        setAddress(data.address);
       } catch (err) {
+        console.error('❌ Error fetching customer:', err);
         toast.error('Something went wrong while fetching customer.');
       } finally {
         setLoading(false);
@@ -50,22 +48,17 @@ export default function EditCustomerForm({ customerId, onClose, onUpdated }: Edi
     e.preventDefault();
 
     try {
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/customers/${customerId}`, {
-        method: 'PUT', // or 'PUT' based on your API
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name, phone, address }),
-      });
+      const res = await axios.put(
+        `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/customers/${customerId}`,
+        { name, phone, address }
+      );
 
-      if (res.ok) {
-        toast.success('Customer updated successfully!');
-        onUpdated(name);
-        onClose();
-      } else {
-        const data = await res.json();
-        toast.error(data.message || 'Failed to update customer.');
-      }
-    } catch (err) {
-      toast.error('Something went wrong while updating.');
+      toast.success('Customer updated successfully!');
+      onUpdated(name);
+      onClose();
+    } catch (err: any) {
+      const errorMessage = err.response?.data?.message || 'Failed to update customer.';
+      toast.error(errorMessage);
     }
   };
 

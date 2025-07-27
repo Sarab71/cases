@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import axios from '@/lib/axios';
 
 interface TotalOutstandingProps {
     startDate?: string;
@@ -10,18 +11,23 @@ interface TotalOutstandingProps {
 export default function TotalOutstanding({ startDate = '', endDate = '' }: TotalOutstandingProps) {
     const [total, setTotal] = useState<number | null>(null);
 
+
     useEffect(() => {
         async function fetchTotal() {
             const params = new URLSearchParams();
             if (startDate) params.append('startDate', startDate);
             if (endDate) params.append('endDate', endDate);
 
-            const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/customers/outstanding?${params.toString()}`);
-            if (res.ok) {
-                const data = await res.json();
-                setTotal(data.totalOutstanding);
+            try {
+                const res = await axios.get(
+                    `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/customers/outstanding?${params.toString()}`
+                );
+                setTotal(res.data.totalOutstanding);
+            } catch (error) {
+                console.error('Error fetching total outstanding:', error);
             }
         }
+
         fetchTotal();
     }, [startDate, endDate]);
 

@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import axios from '@/lib/axios';
 
 interface Customer {
   id: string;
@@ -18,11 +19,8 @@ export default function CustomerSideBar({ onSelectCustomer, refreshTrigger }: Cu
   useEffect(() => {
     const fetchCustomers = async () => {
       try {
-        const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/customers`);
-        if (res.ok) {
-          const data = await res.json();
-          setCustomers(data);
-        }
+        const res = await axios.get(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/customers`);
+        setCustomers(res.data);
       } catch (err) {
         console.error('Failed to fetch customers', err);
       }
