@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import LogoutButton from './LogoutButton';
 
 export default function Header() {
   return (
@@ -11,6 +12,7 @@ export default function Header() {
         <Link href="/expenses" className="hover:underline">Expenses</Link>
         <Link href="/create-bill" className="hover:underline">Create Bill</Link>
         <Link href="/customers" className="hover:underline">Customers</Link>
+        <LogoutButton />
 
       </nav>
     </header>
