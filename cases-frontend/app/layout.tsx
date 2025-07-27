@@ -19,6 +19,7 @@ export default function RootLayout({
     <html lang="en">
       <body>
         <LoadingProvider>
+          <Spinner />
           <GlobalSpinner />
           <Header />
           <main className="p-4">
