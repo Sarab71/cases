@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 
+import com.cases.dto.BillRequestDto;
 import com.cases.dto.BillResponseDto;
 import com.cases.dto.BillUpdateRequestDto;
 import com.cases.model.BillItem;
@@ -36,10 +37,8 @@ public class BillController {
     private final BillRepository billRepository;
 
     @PostMapping
-    public BillResponseDto createBill(
-            @RequestParam String customerId,
-            @RequestBody BillRequest request) {
-        return billService.createBill(customerId, request.getItems());
+    public BillResponseDto createBill(@RequestBody BillRequestDto request) {
+        return billService.createBill(request);
     }
 
     @GetMapping

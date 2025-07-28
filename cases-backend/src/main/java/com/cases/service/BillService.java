@@ -11,6 +11,7 @@ import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
 
+import com.cases.dto.BillRequestDto;
 import com.cases.dto.BillResponseDto;
 import com.cases.dto.BillUpdateRequestDto;
 import com.cases.model.Bill;
@@ -31,15 +32,15 @@ public class BillService {
     private final CustomerRepository customerRepository;
     private final TransactionRepository transactionRepository;
 
-    public BillResponseDto createBill(String customerId, List<BillItem> items) {
-        Optional<Customer> optionalCustomer = customerRepository.findById(customerId);
+    public BillResponseDto createBill(BillRequestDto request) {
+        Optional<Customer> optionalCustomer = customerRepository.findById(request.getCustomerId());
         if (optionalCustomer.isEmpty()) {
             throw new RuntimeException("Customer not found");
         }
 
-        double grandTotal = items.stream()
-                .mapToDouble(BillItem::getTotalAmount)
-                .sum();
+        double grandTotal = request.getItems().stream()
+            .mapToDouble(BillItem::getTotalAmount)
+            .sum();
 
         int latestInvoiceNumber = billRepository.findTopByOrderByInvoiceNumberDesc()
                 .map(b -> b.getInvoiceNumber() + 1)
@@ -48,9 +49,9 @@ public class BillService {
         Bill bill = new Bill();
         bill.setCustomer(optionalCustomer.get());
         bill.setInvoiceNumber(latestInvoiceNumber);
-        bill.setItems(items);
+        bill.setItems(request.getItems());
         bill.setGrandTotal(grandTotal);
-        bill.setDate(new Date());
+        bill.setDate(request.getDate() != null ? request.getDate() : new Date());
         bill.setDueDate(LocalDate.now());
 
         Bill saved = billRepository.save(bill);
