@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import Spinner from '@/components/Spinner'; // adjust the path if needed
+import LoadingBar from '@/components/LoadingBar'; // adjust the path if needed
 
 export default function LogoutButton() {
   const router = useRouter();
@@ -22,7 +22,7 @@ export default function LogoutButton() {
 
   return (
     <>
-      {loading && <Spinner />}
+      {loading && <LoadingBar />}
       <button
         onClick={handleLogout}
         disabled={loading}

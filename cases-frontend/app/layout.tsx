@@ -1,14 +1,15 @@
 'use client';
 import "./globals.css";
 import Header from '@/components/Header';
-import Spinner from '@/components/Spinner';
+import Spinner from '@/components/LoadingBar';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { LoadingProvider, useLoading } from '@/context/LoadingContext';
+import LoadingBar from "@/components/LoadingBar";
 
 function GlobalSpinner() {
   const { loading } = useLoading();
-  return loading ? <Spinner /> : null;
+  return loading ? <LoadingBar /> : null;
 }
 
 export default function RootLayout({
