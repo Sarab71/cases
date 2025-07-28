@@ -1,48 +1,56 @@
 "use client";
+
 import { useState } from 'react';
 import TotalOutstanding from '@/components/TotalOutstanding';
 import PaymentsReceived from '@/components/PaymentsReceived';
 import TotalSales from '@/components/TotalSales';
 import TotalExpenses from '@/components/TotalExpenses';
+import TodayDueSidebar from '@/components/TodayDueSideBar'; // <-- Add this
 
 export default function Home() {
   const [startDate, setStartDate] = useState('');
   const [endDate, setEndDate] = useState('');
 
   return (
-    <>
-      <h1 className="text-center text-2xl font-bold mb-2">Welcome to the Billing System</h1>
-      <p className="text-center mb-8">Manage your bills and payments efficiently.</p>
-      
-      <div className="flex justify-center gap-4 mb-6">
-        <div>
-          <label className="block text-sm font-medium">Start Date</label>
-          <input
-            type="date"
-            value={startDate}
-            onChange={e => setStartDate(e.target.value)}
-            className="border rounded p-1"
-            max={endDate || undefined}
-          />
-        </div>
-        <div>
-          <label className="block text-sm font-medium">End Date</label>
-          <input
-            type="date"
-            value={endDate}
-            onChange={e => setEndDate(e.target.value)}
-            className="border rounded p-1"
-            min={startDate || undefined}
-          />
-        </div>
-      </div>
+    <div className="flex">
+      {/* Sidebar */}
+      <TodayDueSidebar />
 
-      <div className="flex flex-col md:flex-row justify-center items-center gap-6">
-        <TotalOutstanding startDate={startDate} endDate={endDate} />
-        <PaymentsReceived startDate={startDate} endDate={endDate} />
-        <TotalSales startDate={startDate} endDate={endDate} />
-        <TotalExpenses startDate={startDate} endDate={endDate} />
-      </div>
-    </>
+      {/* Main Content */}
+      <main className="ml-64 p-4 w-full"> {/* ml-64 because sidebar is fixed 64px wide */}
+        <h1 className="text-center text-2xl font-bold mb-2">Welcome to the Billing System</h1>
+        <p className="text-center mb-8">Manage your bills and payments efficiently.</p>
+
+        <div className="flex justify-center gap-4 mb-6">
+          <div>
+            <label className="block text-sm font-medium">Start Date</label>
+            <input
+              type="date"
+              value={startDate}
+              onChange={e => setStartDate(e.target.value)}
+              className="border rounded p-1"
+              max={endDate || undefined}
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium">End Date</label>
+            <input
+              type="date"
+              value={endDate}
+              onChange={e => setEndDate(e.target.value)}
+              className="border rounded p-1"
+              min={startDate || undefined}
+            />
+          </div>
+        </div>
+
+        <div className="flex flex-col md:flex-row justify-center items-center gap-6">
+          <TotalOutstanding startDate={startDate} endDate={endDate} />
+          <PaymentsReceived startDate={startDate} endDate={endDate} />
+          <TotalSales startDate={startDate} endDate={endDate} />
+          <TotalExpenses startDate={startDate} endDate={endDate} />
+        </div>
+      </main>
+    </div>
   );
 }
