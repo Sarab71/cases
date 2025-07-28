@@ -1,5 +1,6 @@
 package com.cases.service;
 
+import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.Date;
 import java.util.HashMap;
@@ -50,7 +51,7 @@ public class BillService {
         bill.setItems(items);
         bill.setGrandTotal(grandTotal);
         bill.setDate(new Date());
-        bill.setDueDate(new Date());
+        bill.setDueDate(LocalDate.now());
 
         Bill saved = billRepository.save(bill);
 
@@ -83,6 +84,13 @@ public class BillService {
     public Optional<BillResponseDto> getBillById(String id) {
         return billRepository.findById(id)
                 .map(this::convertToDto);
+    }
+
+    public List<BillResponseDto> getBillsByDueDate(LocalDate dueDate) {
+        List<Bill> bills = billRepository.findByDueDate(dueDate);
+        return bills.stream()
+                .map(this::convertToDto)
+                .collect(Collectors.toList());
     }
 
     public Map<String, Object> updateBill(String billId, BillUpdateRequestDto request) {
@@ -169,7 +177,7 @@ public class BillService {
                 .date(bill.getDate().toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime())
                 .items(bill.getItems())
                 .grandTotal(bill.getGrandTotal())
-                .dueDate(bill.getDueDate().toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime())
+                .dueDate(bill.getDueDate())
                 .build();
     }
 }

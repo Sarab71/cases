@@ -1,5 +1,6 @@
 package com.cases.dto;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -21,6 +22,6 @@ public class BillResponseDto {
     private LocalDateTime date;
     private List<BillItem> items;
     private double grandTotal;
-    private LocalDateTime dueDate;
+    private LocalDate dueDate;
 
 }

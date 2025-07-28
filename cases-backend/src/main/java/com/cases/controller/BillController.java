@@ -1,8 +1,10 @@
 package com.cases.controller;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
 
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -49,6 +51,14 @@ public class BillController {
     public BillResponseDto getBillById(@PathVariable String id) {
         return billService.getBillById(id)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Bill not found"));
+    }
+
+    @GetMapping("/by-due-date")
+    public ResponseEntity<List<BillResponseDto>> getBillsByDueDate(
+            @RequestParam("date") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate dueDate) {
+
+        List<BillResponseDto> bills = billService.getBillsByDueDate(dueDate);
+        return ResponseEntity.ok(bills);
     }
 
     @Data
