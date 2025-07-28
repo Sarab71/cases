@@ -55,7 +55,7 @@ export default function DueDateBills() {
           onClick={fetchBills}
           className="bg-blue-600 text-white px-4 py-1 rounded hover:bg-blue-700"
         >
-          Fetch
+          Get
         </button>
       </div>
 
@@ -68,7 +68,7 @@ export default function DueDateBills() {
           {bills.map((bill) => (
             <div key={bill.id} className="border p-3 rounded shadow-sm bg-gray-50">
               <p><strong>Invoice #:</strong> {bill.invoiceNumber}</p>
-              <p><strong>Customer ID:</strong> {bill.customerName}</p>
+              <p><strong>Customer Name:</strong> {bill.customerName}</p>
               <p><strong>Date:</strong> {format(new Date(bill.date), 'yyyy-MM-dd HH:mm')}</p>
               <p><strong>Due Date:</strong> {bill.dueDate}</p>
               <p><strong>Grand Total:</strong> ₹{bill.grandTotal}</p>
