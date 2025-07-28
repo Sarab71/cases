@@ -50,6 +50,7 @@ public class BillService {
         bill.setItems(items);
         bill.setGrandTotal(grandTotal);
         bill.setDate(new Date());
+        bill.setDueDate(null);
 
         Bill saved = billRepository.save(bill);
 
