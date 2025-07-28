@@ -31,7 +31,7 @@ export default function DueDateBills() {
     if (!selectedDate) return;
     setLoading(true);
     try {
-      const res = await axios.get(`${process.env.NEXT_PUBLIC_API_BASE_UR}/api/bills/by-due-date?date=${selectedDate}`);
+      const res = await axios.get(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/bills/by-due-date?date=${selectedDate}`);
       setBills(res.data);
     } catch (err) {
       console.error('Failed to fetch bills:', err);
