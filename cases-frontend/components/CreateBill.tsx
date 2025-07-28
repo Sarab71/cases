@@ -151,6 +151,7 @@ export default function CreateBillForm() {
     });
 
     const payload = {
+      customerId: selectedCustomer.id,   // 🔴 Required for backend
       invoiceNumber,
       date: billDate,
       items: processedItems,
@@ -165,9 +166,6 @@ export default function CreateBillForm() {
         `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/bills`,
         payload,
         {
-          params: {
-            customerId: selectedCustomer.id,
-          },
           headers: {
             'Content-Type': 'application/json',
           },
