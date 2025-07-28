@@ -22,7 +22,7 @@ public class Bill {
     @DBRef
     private Customer customer; // Reference to Customer document
 
-    private Date date = new Date(); // Default to current date
+    private Date date; // Default to current date
 
     private List<BillItem> items; // Embedded list of bill items
 
