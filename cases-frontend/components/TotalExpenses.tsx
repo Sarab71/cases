@@ -17,6 +17,7 @@ export default function TotalExpenses({ startDate = '', endDate = '' }: TotalExp
 
             if (startDate) {
                 const start = new Date(startDate);
+                start.setHours(0, 0, 0, 0);
                 params.append('startDate', start.toISOString());
             }
 

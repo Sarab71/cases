@@ -17,6 +17,7 @@ export default function TotalSales({ startDate = '', endDate = '' }: TotalSalesP
 
             if (startDate) {
                 const start = new Date(startDate);
+                start.setHours(0, 0, 0, 0);
                 params.append('startDate', start.toISOString());
             }
 
