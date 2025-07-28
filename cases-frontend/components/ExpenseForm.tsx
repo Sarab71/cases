@@ -195,7 +195,6 @@ export default function ExpenseForm() {
           className="border p-2 rounded w-full"
           placeholder="Date"
         />
-        <span className="text-xs text-gray-500">Leave blank for today</span>
       </div>
       <button
         type="submit"
