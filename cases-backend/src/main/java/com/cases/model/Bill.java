@@ -26,4 +26,6 @@ public class Bill {
     private List<BillItem> items; // Embedded list of bill items
 
     private double grandTotal;
+
+    private Date dueDate;
 }

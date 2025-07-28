@@ -11,7 +11,7 @@ import java.util.stream.Collectors;
 import org.springframework.stereotype.Service;
 
 import com.cases.dto.BillResponseDto;
-import com.cases.dto.BillUpdateRequest;
+import com.cases.dto.BillUpdateRequestDto;
 import com.cases.model.Bill;
 import com.cases.model.BillItem;
 import com.cases.model.Customer;
@@ -84,7 +84,7 @@ public class BillService {
                 .map(this::convertToDto);
     }
 
-    public Map<String, Object> updateBill(String billId, BillUpdateRequest request) {
+    public Map<String, Object> updateBill(String billId, BillUpdateRequestDto request) {
         Bill bill = billRepository.findById(billId)
                 .orElseThrow(() -> new RuntimeException("Bill not found"));
 
@@ -107,7 +107,9 @@ public class BillService {
         if (request.getDate() != null) {
             bill.setDate(request.getDate());
         }
-
+        if (request.getDueDate() != null) {
+            bill.setDueDate(request.getDueDate());
+        }
         billRepository.save(bill);
 
         Optional<Transaction> transactionOpt = transactionRepository.findByRelatedBill_Id(billId);
@@ -166,6 +168,9 @@ public class BillService {
                 .date(bill.getDate().toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime())
                 .items(bill.getItems())
                 .grandTotal(bill.getGrandTotal())
+                .dueDate(bill.getDueDate() != null
+                        ? bill.getDueDate().toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime()
+                        : null)
                 .build();
     }
 }

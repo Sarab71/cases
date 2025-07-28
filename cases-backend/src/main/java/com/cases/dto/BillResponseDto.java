@@ -21,4 +21,6 @@ public class BillResponseDto {
     private LocalDateTime date;
     private List<BillItem> items;
     private double grandTotal;
+    private LocalDateTime dueDate;
+
 }

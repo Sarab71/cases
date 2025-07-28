@@ -17,7 +17,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 
 import com.cases.dto.BillResponseDto;
-import com.cases.dto.BillUpdateRequest;
+import com.cases.dto.BillUpdateRequestDto;
 import com.cases.model.BillItem;
 import com.cases.repository.BillRepository;
 import com.cases.service.BillService;
@@ -63,7 +63,7 @@ public class BillController {
     }
 
     @PatchMapping("/{id}")
-    public ResponseEntity<?> updateBill(@PathVariable String id, @RequestBody BillUpdateRequest request) {
+    public ResponseEntity<?> updateBill(@PathVariable String id, @RequestBody BillUpdateRequestDto request) {
         return ResponseEntity.ok(billService.updateBill(id, request));
     }
 
