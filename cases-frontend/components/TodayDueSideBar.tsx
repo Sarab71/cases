@@ -1,9 +1,5 @@
 'use client';
 
-import { useEffect, useState } from 'react';
-import axios from '@/lib/axios';
-import { format } from 'date-fns';
-
 interface Bill {
   id: string;
   customerName: string;
@@ -12,25 +8,11 @@ interface Bill {
   dueDate: string;
 }
 
-export default function TodayDueSideBar() {
-  const [bills, setBills] = useState<Bill[]>([]);
+interface TodayDueSideBarProps {
+  bills: Bill[];
+}
 
-  useEffect(() => {
-    const fetchDueBills = async () => {
-      const today = format(new Date(), 'yyyy-MM-dd');
-      try {
-        const res = await axios.get(
-          `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/bills/by-due-date?date=${today}`
-        );
-        setBills(res.data);
-      } catch (err) {
-        console.error('Failed to fetch today\'s due bills', err);
-      }
-    };
-
-    fetchDueBills();
-  }, []);
-
+export default function TodayDueSideBar({ bills }: TodayDueSideBarProps) {
   return (
     <aside className="w-64 fixed top-0 left-0 h-screen bg-blue-700 p-4 overflow-y-auto shadow-lg z-50">
       <h2 className="text-xl font-bold text-white mb-4">Today's Due</h2>
