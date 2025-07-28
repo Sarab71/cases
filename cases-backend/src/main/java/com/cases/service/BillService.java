@@ -61,7 +61,7 @@ public class BillService {
                 .amount(grandTotal)
                 .type("debit")
                 .description("Bill Invoice #" + latestInvoiceNumber)
-                .date(new Date())
+                .date(bill.getDate())
                 .relatedBill(saved) // ✅ Reference full Bill object, not ID
                 .invoiceNumber(latestInvoiceNumber)
                 .build();
