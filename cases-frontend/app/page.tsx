@@ -7,7 +7,7 @@ import TotalSales from '@/components/TotalSales';
 import TotalExpenses from '@/components/TotalExpenses';
 import PaymentsReceived from '@/components/PaymentsReceived';
 import TotalOutstanding from '@/components/TotalOutstanding';
-import TodayDueSideBar from '@/components/TodayDueSideBar'; // ⬅️ Add this component
+import TodayDueSideBar from '@/components/TodayDueSideBar';
 
 export default function Home() {
   const [startDate, setStartDate] = useState('');
@@ -19,7 +19,7 @@ export default function Home() {
     totalExpenses: null,
     totalPayment: null,
     totalOutstanding: null,
-    dueBills: [], // ⬅️ new addition
+    dueBills: [],
   });
 
   useEffect(() => {
@@ -75,11 +75,46 @@ export default function Home() {
   if (loading) return <div className="text-center py-4">Loading dashboard...</div>;
 
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4">
-      <TotalSales total={data.totalSales} />
-      <TotalExpenses total={data.totalExpenses} />
-      <PaymentsReceived total={data.totalPayment} />
-      <TotalOutstanding total={data.totalOutstanding} />
+    <div className="ml-64 p-4"> {/* leave space for the fixed sidebar */}
+      {/* 🔵 Date Filters Centered */}
+      <div className="flex justify-center gap-4 mb-6">
+        <div>
+          <label className="block text-sm font-medium text-center">Start Date</label>
+          <input
+            type="date"
+            value={startDate}
+            onChange={(e) => setStartDate(e.target.value)}
+            className="border rounded px-2 py-1"
+          />
+        </div>
+        <div>
+          <label className="block text-sm font-medium text-center">End Date</label>
+          <input
+            type="date"
+            value={endDate}
+            onChange={(e) => setEndDate(e.target.value)}
+            className="border rounded px-2 py-1"
+          />
+        </div>
+      </div>
+
+      {/* 🔵 Compact Cards */}
+      <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-4">
+        <div className="p-3 bg-white rounded shadow-sm text-sm">
+          <TotalSales total={data.totalSales} />
+        </div>
+        <div className="p-3 bg-white rounded shadow-sm text-sm">
+          <TotalExpenses total={data.totalExpenses} />
+        </div>
+        <div className="p-3 bg-white rounded shadow-sm text-sm">
+          <PaymentsReceived total={data.totalPayment} />
+        </div>
+        <div className="p-3 bg-white rounded shadow-sm text-sm">
+          <TotalOutstanding total={data.totalOutstanding} />
+        </div>
+      </div>
+
+      {/* 🔵 Fixed Sidebar */}
       <TodayDueSideBar bills={data.dueBills} />
     </div>
   );
