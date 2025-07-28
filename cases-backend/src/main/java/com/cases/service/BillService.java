@@ -169,9 +169,7 @@ public class BillService {
                 .date(bill.getDate().toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime())
                 .items(bill.getItems())
                 .grandTotal(bill.getGrandTotal())
-                .dueDate(bill.getDueDate() != null
-                        ? bill.getDueDate().toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime()
-                        : null)
+                .dueDate(bill.getDueDate().toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime())
                 .build();
     }
 }
