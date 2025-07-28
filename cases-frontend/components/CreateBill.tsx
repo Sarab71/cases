@@ -158,9 +158,6 @@ export default function CreateBillForm() {
       grandTotal,
     };
 
-    console.log("Customer ID:", selectedCustomer?.id);
-    console.log("Payload:", payload);
-
     try {
       await axios.post(
         `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/bills`,
