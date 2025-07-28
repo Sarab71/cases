@@ -50,7 +50,6 @@ export default function CreateBillForm() {
     try {
       const res = await axios.get<Customer[]>('/customers');
       setCustomers(res.data);
-      console.log("✅ Customers fetched:", res.data);
     } catch (error) {
       console.error("❌ Error fetching customers:", error);
     }

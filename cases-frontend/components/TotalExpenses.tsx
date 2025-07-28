@@ -26,8 +26,6 @@ export default function TotalExpenses({ startDate = '', endDate = '' }: TotalExp
                 params.append('endDate', end.toISOString());
             }
 
-            console.log('🔍 Params:', params.toString());
-
             try {
                 const res = await axios.get(
                     `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/expenses/total?${params.toString()}`

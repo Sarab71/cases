@@ -26,8 +26,6 @@ export default function TotalSales({ startDate = '', endDate = '' }: TotalSalesP
                 params.append('endDate', end.toISOString());
             }
 
-            console.log('🔍 Params:', params.toString()); // debug line
-
             try {
                 const res = await axios.get(
                     `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/sales/total?${params.toString()}`
