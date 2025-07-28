@@ -174,6 +174,7 @@ public class BillService {
                 .id(bill.getId())
                 .invoiceNumber(bill.getInvoiceNumber())
                 .customerId(bill.getCustomer().getId())
+                .customerName(bill.getCustomer().getName())
                 .date(bill.getDate().toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime())
                 .items(bill.getItems())
                 .grandTotal(bill.getGrandTotal())

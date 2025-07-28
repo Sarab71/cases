@@ -19,6 +19,7 @@ public class BillResponseDto {
     private String id;
     private int invoiceNumber;
     private String customerId;
+    private String customerName;
     private LocalDateTime date;
     private List<BillItem> items;
     private double grandTotal;
