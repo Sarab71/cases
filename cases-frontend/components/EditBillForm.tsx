@@ -18,6 +18,7 @@ interface Bill {
   items: Item[];
   customerId: string;
   date?: string;
+  dueDate?: string;
 }
 
 interface Customer {
@@ -37,6 +38,7 @@ export default function EditBillForm({ billId, onClose, onUpdated }: EditBillFor
   const [items, setItems] = useState<Item[]>([]);
   const [editDate, setEditDate] = useState<string>('');
   const [customer, setCustomer] = useState<Customer | null>(null);
+  const [dueDate, setDueDate] = useState<string>('');
 
   useEffect(() => {
     const fetchBill = async () => {
@@ -46,6 +48,7 @@ export default function EditBillForm({ billId, onClose, onUpdated }: EditBillFor
         setBill(data);
         setItems(data.items);
         setEditDate(data.date ? data.date.split('T')[0] : '');
+        setDueDate(data.dueDate ? data.dueDate.split('T')[0] : '');
 
         // Fetch customer
         const custRes = await axios.get(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/customers/${data.customerId}`);
@@ -92,6 +95,7 @@ export default function EditBillForm({ billId, onClose, onUpdated }: EditBillFor
     try {
       await axios.patch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/bills/${billId}`, {
         date: editDate,
+        dueDate: dueDate,
         items: updatedItems,
         grandTotal,
       });
@@ -176,6 +180,16 @@ export default function EditBillForm({ billId, onClose, onUpdated }: EditBillFor
           required
         />
       </div>
+      <div>
+        <label className="block font-medium mb-1">Due Date</label>
+        <input
+          type="date"
+          value={dueDate}
+          onChange={e => setDueDate(e.target.value)}
+          className="border p-2 rounded w-full"
+        />
+      </div>
+
 
       <div className="overflow-x-auto">
         <table className="min-w-full border text-sm">
