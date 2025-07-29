@@ -1,7 +1,6 @@
 package com.cases.controller;
 
-import java.time.Instant;
-import java.util.Date;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
 
@@ -32,11 +31,11 @@ public class SalesController {
         try {
             List<Transaction> debitTxns;
 
-            if (startDate != null && endDate != null) {
-                Date start = Date.from(Instant.parse(startDate));
-                Date end = Date.from(Instant.parse(endDate));
+        if (startDate != null && endDate != null) {
+            LocalDate start = LocalDate.parse(startDate);
+            LocalDate end = LocalDate.parse(endDate);
 
-                debitTxns = transactionRepository.findByTypeAndDateBetween("debit", start, end);
+            debitTxns = transactionRepository.findByTypeAndDateBetween("debit", start, end);
             } else {
                 debitTxns = transactionRepository.findByType("debit");
             }

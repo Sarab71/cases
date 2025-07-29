@@ -1,6 +1,6 @@
 package com.cases.repository;
 
-import java.util.Date;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
@@ -18,6 +18,6 @@ public interface TransactionRepository extends MongoRepository<Transaction, Stri
     
     List<Transaction> findByType(String type);
 
-    List<Transaction> findByTypeAndDateBetween(String type, Date startDate, Date endDate);
+    List<Transaction> findByTypeAndDateBetween(String type, LocalDate startDate, LocalDate endDate);
 
 }

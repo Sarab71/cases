@@ -1,7 +1,6 @@
 package com.cases.controller;
 
-import java.time.Instant;
-import java.util.Date;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -48,9 +47,9 @@ public class PaymentController {
                 return ResponseEntity.status(404).body("Customer not found.");
             }
 
-            Date txnDate = request.getDate() != null
-                    ? Date.from(Instant.parse(request.getDate()))
-                    : new Date();
+            LocalDate txnDate = request.getDate() != null
+                    ? LocalDate.parse(request.getDate())
+                    : LocalDate.now();
 
             Transaction transaction = Transaction.builder()
                     .customer(customer)
@@ -128,7 +127,7 @@ public class PaymentController {
         }
 
         if (request.getDate() != null) {
-            payment.setDate(Date.from(Instant.parse(request.getDate())));
+            payment.setDate(LocalDate.parse(request.getDate()));
         }
 
         transactionRepository.save(payment);
@@ -148,10 +147,11 @@ public class PaymentController {
             List<Transaction> creditTxns;
 
             if (startDate != null && endDate != null) {
-                Date start = Date.from(Instant.parse(startDate));
-                Date end = Date.from(Instant.parse(endDate));
+                LocalDate start = LocalDate.parse(startDate);
+                LocalDate end = LocalDate.parse(endDate);
 
                 creditTxns = transactionRepository.findByTypeAndDateBetween("credit", start, end);
+
             } else {
                 creditTxns = transactionRepository.findByType("credit");
             }

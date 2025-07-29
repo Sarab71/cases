@@ -1,7 +1,6 @@
 package com.cases.dto;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.List;
 
 import com.cases.model.BillItem;
@@ -20,7 +19,7 @@ public class BillResponseDto {
     private int invoiceNumber;
     private String customerId;
     private String customerName;
-    private LocalDateTime date;
+    private LocalDate date;
     private List<BillItem> items;
     private double grandTotal;
     private LocalDate dueDate;

@@ -1,6 +1,6 @@
 package com.cases.service;
 
-import java.util.Date;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
@@ -19,7 +19,7 @@ public class TransactionService {
 
     public Transaction createTransaction(Transaction transaction) {
         if (transaction.getDate() == null) {
-            transaction.setDate(new Date());
+            transaction.setDate(LocalDate.now());
         }
         return transactionRepository.save(transaction);
     }

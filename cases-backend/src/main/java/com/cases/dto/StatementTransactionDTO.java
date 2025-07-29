@@ -1,7 +1,7 @@
 package com.cases.dto;
 
 import java.math.BigDecimal;
-import java.util.Date;
+import java.time.LocalDate;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -12,7 +12,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class StatementTransactionDTO {
     private String id;
-    private Date date;
+    private LocalDate date;
     private String particulars;
     private Integer debit;
     private Integer credit;

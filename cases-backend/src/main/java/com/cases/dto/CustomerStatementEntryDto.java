@@ -1,6 +1,6 @@
 package com.cases.dto;
 
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -14,7 +14,7 @@ import lombok.NoArgsConstructor;
 public class CustomerStatementEntryDto {
     private String type; // "debit" or "credit"
     private double amount;
-    private LocalDateTime date;
+    private LocalDate date;
     private String description;
     private Integer invoiceNumber;
     private String relatedBillId;

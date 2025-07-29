@@ -1,6 +1,6 @@
 package com.cases.dto;
 
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -15,7 +15,7 @@ public class TransactionResponseDto {
     private String id;
     private String type;
     private double amount;
-    private LocalDateTime date;
+    private LocalDate date;
     private String description;
     private String relatedBillId;
     private Integer invoiceNumber;

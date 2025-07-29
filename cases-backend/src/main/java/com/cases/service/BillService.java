@@ -1,8 +1,6 @@
 package com.cases.service;
 
 import java.time.LocalDate;
-import java.time.ZoneId;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -51,7 +49,7 @@ public class BillService {
         bill.setInvoiceNumber(latestInvoiceNumber);
         bill.setItems(request.getItems());
         bill.setGrandTotal(grandTotal);
-        bill.setDate(request.getDate() != null ? request.getDate() : new Date());
+        bill.setDate(request.getDate() != null ? request.getDate() : LocalDate.now());
         bill.setDueDate(LocalDate.now());
 
         Bill saved = billRepository.save(bill);
@@ -176,7 +174,7 @@ public class BillService {
                 .invoiceNumber(bill.getInvoiceNumber())
                 .customerId(bill.getCustomer().getId())
                 .customerName(bill.getCustomer().getName())
-                .date(bill.getDate().toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime())
+                .date(bill.getDate())
                 .items(bill.getItems())
                 .grandTotal(bill.getGrandTotal())
                 .dueDate(bill.getDueDate())

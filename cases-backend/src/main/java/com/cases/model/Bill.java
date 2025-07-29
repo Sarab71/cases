@@ -1,7 +1,6 @@
 package com.cases.model;
 
 import java.time.LocalDate;
-import java.util.Date;
 import java.util.List;
 
 import org.springframework.data.annotation.Id;
@@ -22,7 +21,7 @@ public class Bill {
     @DBRef
     private Customer customer; // Reference to Customer document
 
-    private Date date; // Default to current date
+    private LocalDate date; // Default to current date
 
     private List<BillItem> items; // Embedded list of bill items
 

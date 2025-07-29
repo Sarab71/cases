@@ -1,6 +1,6 @@
 package com.cases.dto;
 
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 
 import lombok.Data;
 
@@ -11,6 +11,6 @@ public class CustomerResponseDto {
     private String phone;
     private String address;
     private double balance;
-    private LocalDateTime createdAt;
-    private LocalDateTime updatedAt;
+    private LocalDate createdAt;
+    private LocalDate updatedAt;
 }

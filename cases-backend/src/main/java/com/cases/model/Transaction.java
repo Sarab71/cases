@@ -1,6 +1,6 @@
 package com.cases.model;
 
-import java.util.Date;
+import java.time.LocalDate;
 
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.DBRef;
@@ -28,7 +28,7 @@ public class Transaction {
 
     private double amount;
 
-    private Date date;
+    private LocalDate date;
 
     private String description;
 
