@@ -207,7 +207,7 @@ export default function CreateBillForm() {
           customer: selectedCustomer,
           items: processedItems,
           grandTotal,
-          date: new Date().toLocaleDateString(),
+          date: new Date(billDate).toLocaleDateString(),
         },
         {
           responseType: 'blob',
