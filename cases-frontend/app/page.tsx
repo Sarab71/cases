@@ -27,8 +27,7 @@ export default function Home() {
 
       if (endDate) {
         const end = new Date(endDate);
-        end.setDate(end.getDate() + 1);
-
+        end.setHours(23, 59, 59, 999);
         params.append('endDate', end.toISOString().split('T')[0]);
 
       }
