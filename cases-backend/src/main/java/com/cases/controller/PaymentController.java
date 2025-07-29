@@ -48,7 +48,7 @@ public class PaymentController {
             }
 
             LocalDate txnDate = request.getDate() != null
-                    ? LocalDate.parse(request.getDate())
+                    ? request.getDate()
                     : LocalDate.now();
 
             Transaction transaction = Transaction.builder()
@@ -127,7 +127,7 @@ public class PaymentController {
         }
 
         if (request.getDate() != null) {
-            payment.setDate(LocalDate.parse(request.getDate()));
+            payment.setDate(request.getDate());
         }
 
         transactionRepository.save(payment);
