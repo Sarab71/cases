@@ -36,7 +36,7 @@ export default function Home() {
         const [salesRes, paymentsRes, expensesRes] = await Promise.all([
           axios.get(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/sales/total?${params}`),
           axios.get(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/payments/total?${params}`),
-          axios.get(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/expenses/total?${params.toString()}`),
+          axios.get(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/expenses/total?${params.toString()}`),//rollback
         ]);
 
         setTotalSales(salesRes.data.totalSales || 0);
