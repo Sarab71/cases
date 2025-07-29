@@ -8,7 +8,6 @@ export default function Header() {
         <Link href="/" className="hover:underline">Home</Link>
         <Link href="/add-customer" className="hover:underline">Add Customer</Link>
         <Link href="/add-payment" className="hover:underline">Add Payment</Link>
-        <Link href="/add-expense" className="hover:underline">Add Expense</Link>
         <Link href="/expenses" className="hover:underline">Expenses</Link>
         <Link href="/create-bill" className="hover:underline">Create Bill</Link>
         <Link href="/customers" className="hover:underline">Customers</Link>
