@@ -65,12 +65,12 @@ export default function PaymentEditForm({ paymentId, onClose, onUpdated }: Payme
         e.preventDefault();
         if (!payment) return;
 
-        const isoDate = new Date(editDate).toISOString();
+        const localDate = editDate;
 
         try {
             await axios.patch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/payments/${paymentId}`, {
                 amount: Number(editAmount),
-                date: isoDate,
+                date: localDate,
             });
 
             toast.success('Payment updated successfully!');
