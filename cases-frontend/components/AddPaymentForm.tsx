@@ -85,7 +85,7 @@ export default function AddPaymentForm() {
         customerId: selectedCustomer.id,
         amount: Number(amount),
         description,
-        date: new Date(date + 'T00:00').toISOString(),
+        date: new Date(date).toISOString(),
       });
 
       toast.success('Payment added successfully!');
