@@ -10,12 +10,10 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.cases.dto.CustomerRequestDto;
 import com.cases.dto.CustomerResponseDto;
-import com.cases.dto.OutstandingResponseDto;
 import com.cases.service.CustomerService;
 
 import lombok.RequiredArgsConstructor;
@@ -60,22 +58,6 @@ public class CustomerController {
     public ResponseEntity<String> deleteCustomer(@PathVariable String id) {
         customerService.deleteCustomer(id);
         return ResponseEntity.ok("Customer deleted successfully");
-    }
-
-    @GetMapping("/outstanding")
-    public ResponseEntity<OutstandingResponseDto> getOutstandingBetweenDates(
-            @RequestParam(required = false) String startDate,
-            @RequestParam(required = false) String endDate) {
-
-        double totalOutstanding;
-
-        if (startDate != null && endDate != null) {
-            totalOutstanding = customerService.calculateOutstandingBetweenDates(startDate, endDate);
-        } else {
-            totalOutstanding = customerService.calculateTotalOutstanding();
-        }
-
-        return ResponseEntity.ok(new OutstandingResponseDto(totalOutstanding));
     }
 
 }

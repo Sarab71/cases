@@ -10,7 +10,6 @@ import org.springframework.stereotype.Service;
 
 import com.cases.dto.CustomerRequestDto;
 import com.cases.dto.CustomerResponseDto;
-import com.cases.dto.OutstandingResponseDto;
 import com.cases.model.Customer;
 import com.cases.repository.CustomerRepository;
 
@@ -73,41 +72,6 @@ public class CustomerService {
         CustomerResponseDto responseDto = new CustomerResponseDto();
         BeanUtils.copyProperties(customer, responseDto);
         return responseDto;
-    }
-
-    public OutstandingResponseDto getOutstanding(String startDate, String endDate) {
-        // parse karenge ISO date strings se
-        LocalDate start = LocalDate.parse(startDate);
-        LocalDate end = LocalDate.parse(endDate).plusDays(1); // include full endDate
-        LocalDateTime startDt = start.atStartOfDay();
-        LocalDateTime endDt = end.atStartOfDay();
-
-        List<Customer> list = customerRepository.findByUpdatedAtBetween(startDt, endDt);
-        double sum = list.stream()
-                .mapToDouble(Customer::getBalance)
-                .sum();
-
-        return new OutstandingResponseDto(sum);
-    }
-
-    public double calculateOutstandingBetweenDates(String startDateStr, String endDateStr) {
-        LocalDate startDate = LocalDate.parse(startDateStr);
-        LocalDate endDate = LocalDate.parse(endDateStr).plusDays(1); // exclusive end
-
-        return customerRepository.findAll().stream()
-                .filter(c -> {
-                    LocalDate updatedAt = c.getUpdatedAt().toLocalDate();
-                    return (updatedAt.isEqual(startDate) || updatedAt.isAfter(startDate))
-                            && updatedAt.isBefore(endDate);
-                })
-                .mapToDouble(Customer::getBalance)
-                .sum();
-    }
-
-    public double calculateTotalOutstanding() {
-        return customerRepository.findAll().stream()
-                .mapToDouble(Customer::getBalance)
-                .sum();
     }
 
 }
