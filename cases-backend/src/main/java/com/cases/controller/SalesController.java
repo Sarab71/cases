@@ -33,7 +33,7 @@ public class SalesController {
 
         if (startDate != null && endDate != null) {
             LocalDate start = LocalDate.parse(startDate);
-            LocalDate end = LocalDate.parse(endDate);
+            LocalDate end = LocalDate.parse(endDate).plusDays(1);
 
             debitTxns = transactionRepository.findByTypeAndDateBetween("debit", start, end);
             } else {

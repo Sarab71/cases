@@ -148,7 +148,7 @@ public class PaymentController {
 
             if (startDate != null && endDate != null) {
                 LocalDate start = LocalDate.parse(startDate);
-                LocalDate end = LocalDate.parse(endDate);
+                LocalDate end = LocalDate.parse(endDate).plusDays(1);
 
                 creditTxns = transactionRepository.findByTypeAndDateBetween("credit", start, end);
 
