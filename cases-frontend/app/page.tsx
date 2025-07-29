@@ -22,13 +22,14 @@ export default function Home() {
       if (startDate) {
         const start = new Date(startDate);
         start.setHours(0, 0, 0, 0);
-        params.append('startDate', start.toISOString());
+        params.append('startDate', start.toISOString().split('T')[0]);
       }
 
       if (endDate) {
         const end = new Date(endDate);
         end.setHours(23, 59, 59, 999);
-        params.append('endDate', end.toISOString());
+        params.append('endDate', end.toISOString().split('T')[0]);
+
       }
 
       try {
