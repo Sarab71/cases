@@ -17,26 +17,31 @@ export default function Home() {
 
   useEffect(() => {
     async function fetchTotals() {
-      const params = new URLSearchParams();
+      const startParam = startDate;
+      const endParam = endDate;
 
-      if (startDate) {
-        const start = new Date(startDate);
-        start.setHours(0, 0, 0, 0);
-        params.append('startDate', start.toISOString().split('T')[0]);
+      const paramsForSalesAndPayments = new URLSearchParams();
+      const paramsForExpenses = new URLSearchParams();
+
+      if (startParam) {
+        paramsForSalesAndPayments.append('startDate', startParam);
+        paramsForExpenses.append('startDate', startParam);
       }
 
-      if (endDate) {
-        const end = new Date(endDate);
-        end.setHours(23, 59, 59, 999);
-        params.append('endDate', end.toISOString().split('T')[0]);
+      if (endParam) {
+        const end = new Date(endParam);
+        end.setDate(end.getDate() + 1); // Add 1 day
+        const endPlusOne = end.toISOString().split('T')[0];
 
+        paramsForSalesAndPayments.append('endDate', endPlusOne);
+        paramsForExpenses.append('endDate', endParam); // No +1 for expenses
       }
 
       try {
         const [salesRes, paymentsRes, expensesRes] = await Promise.all([
-          axios.get(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/sales/total?${params}`),
-          axios.get(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/payments/total?${params}`),
-          axios.get(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/expenses/total?${params.toString()}`),
+          axios.get(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/sales/total?${paramsForSalesAndPayments}`),
+          axios.get(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/payments/total?${paramsForSalesAndPayments}`),
+          axios.get(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/expenses/total?${paramsForExpenses}`),
         ]);
 
         setTotalSales(salesRes.data.totalSales || 0);
@@ -50,7 +55,8 @@ export default function Home() {
     fetchTotals();
   }, [startDate, endDate]);
 
-  const totalOutstanding = totalSales - totalPayments ;
+
+  const totalOutstanding = totalSales - totalPayments;
 
   return (
     <div className="flex">
@@ -89,7 +95,7 @@ export default function Home() {
           <TotalOutstanding value={totalOutstanding} />
           <PaymentsReceived value={totalPayments} />
           <TotalSales value={totalSales} />
-          <TotalExpenses value={totalExpenses}/>
+          <TotalExpenses value={totalExpenses} />
         </div>
       </main>
     </div>
