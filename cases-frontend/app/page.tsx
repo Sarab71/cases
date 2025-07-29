@@ -13,6 +13,7 @@ export default function Home() {
   const [endDate, setEndDate] = useState('');
   const [totalSales, setTotalSales] = useState(0);
   const [totalPayments, setTotalPayments] = useState(0);
+  const [totalExpenses, setTotalExpenses] = useState(0);
 
   useEffect(() => {
     async function fetchTotals() {
@@ -31,13 +32,15 @@ export default function Home() {
       }
 
       try {
-        const [salesRes, paymentsRes] = await Promise.all([
+        const [salesRes, paymentsRes, expensesRes] = await Promise.all([
           axios.get(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/sales/total?${params}`),
           axios.get(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/payments/total?${params}`),
+          axios.get(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/expenses/total?${params.toString()}`),
         ]);
 
         setTotalSales(salesRes.data.totalSales || 0);
         setTotalPayments(paymentsRes.data.totalPayment || 0);
+        setTotalExpenses(expensesRes.data.totalExpenses || 0);
       } catch (err) {
         console.error('Failed to fetch totals:', err);
       }
@@ -46,7 +49,7 @@ export default function Home() {
     fetchTotals();
   }, [startDate, endDate]);
 
-  const totalOutstanding = totalSales - totalPayments;
+  const totalOutstanding = totalSales - totalPayments ;
 
   return (
     <div className="flex">
@@ -85,7 +88,7 @@ export default function Home() {
           <TotalOutstanding value={totalOutstanding} />
           <PaymentsReceived value={totalPayments} />
           <TotalSales value={totalSales} />
-          <TotalExpenses startDate={startDate} endDate={endDate} />
+          <TotalExpenses value={totalExpenses}/>
         </div>
       </main>
     </div>
