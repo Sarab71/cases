@@ -17,7 +17,7 @@ export default function AddPaymentForm() {
   const [selectedCustomer, setSelectedCustomer] = useState<Customer | null>(null);
   const [amount, setAmount] = useState<string>('');
   const [description, setDescription] = useState<string>('');
-  const [date, setDate] = useState<string>(() => new Date().toISOString().slice(0, 10));
+  const [date, setDate] = useState<string>(new Date().toISOString().split('T')[0]);
   const searchRef = useRef<HTMLInputElement>(null);
 
 
@@ -85,7 +85,7 @@ export default function AddPaymentForm() {
         customerId: selectedCustomer.id,
         amount: Number(amount),
         description,
-        date: new Date(date).toISOString(),
+        date,
       });
 
       toast.success('Payment added successfully!');
