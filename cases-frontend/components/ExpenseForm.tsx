@@ -104,7 +104,7 @@ export default function ExpenseForm() {
     if (date) payload.date = date;
 
     try {
-      await axios.post(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/expenses`, payload);
+      await axios.post(`${process.env.NEXT_PUBLIC_API_BASE_URL}/expenses`, payload);
 
       setDescription('');
       setAmount('');
