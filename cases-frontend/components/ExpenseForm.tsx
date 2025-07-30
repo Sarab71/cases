@@ -35,9 +35,7 @@ export default function ExpenseForm() {
       }
 
       try {
-        const res = await axios.get(`${process.env.NEXT_PUBLIC_API_BASE_URL}/expenses/categories`, {
-          params: { query: category },
-        });
+        const res = await axios.get(`${process.env.NEXT_PUBLIC_API_BASE_URL}/expenses/categories`);
 
         const data: CategorySuggestion[] = res.data;
         setSuggestions(data);
