@@ -39,16 +39,20 @@ export default function ExpenseForm() {
     fetchSuggestions();
   }, []);
 
+  const filteredSuggestions = suggestions.filter(s =>
+    s.category.toLowerCase().includes(category.toLowerCase())
+  );
+
   useEffect(() => {
-    if (!showSuggestions || suggestions.length === 0) return;
+    if (!showSuggestions || filteredSuggestions.length === 0) return;
 
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === 'ArrowDown') {
-        setHighlightedIndex(prev => (prev < suggestions.length - 1 ? prev + 1 : 0));
+        setHighlightedIndex(prev => (prev < filteredSuggestions.length - 1 ? prev + 1 : 0));
       } else if (e.key === 'ArrowUp') {
-        setHighlightedIndex(prev => (prev > 0 ? prev - 1 : suggestions.length - 1));
+        setHighlightedIndex(prev => (prev > 0 ? prev - 1 : filteredSuggestions.length - 1));
       } else if (e.key === 'Enter' && highlightedIndex >= 0) {
-        setCategory(suggestions[highlightedIndex].category);
+        setCategory(filteredSuggestions[highlightedIndex].category);
         setShowSuggestions(false);
         setHighlightedIndex(-1);
         e.preventDefault();
@@ -60,7 +64,7 @@ export default function ExpenseForm() {
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [showSuggestions, suggestions, highlightedIndex]);
+  }, [showSuggestions, filteredSuggestions, highlightedIndex]);
 
   const handleCategorySelect = (cat: string) => {
     setCategory(cat);
@@ -117,12 +121,12 @@ export default function ExpenseForm() {
           placeholder="Enter or select category"
           autoComplete="off"
         />
-        {showSuggestions && suggestions.length > 0 && (
+        {showSuggestions && filteredSuggestions.length > 0 && (
           <ul
             className="absolute left-0 right-0 border bg-white rounded mt-1 max-h-40 overflow-y-auto shadow z-20"
             style={{ top: '100%' }}
           >
-            {suggestions.map((s, idx) => (
+            {filteredSuggestions.map((s, idx) => (
               <li
                 key={s.id}
                 className={`p-2 cursor-pointer ${highlightedIndex === idx ? 'bg-blue-100' : 'hover:bg-blue-50'}`}
