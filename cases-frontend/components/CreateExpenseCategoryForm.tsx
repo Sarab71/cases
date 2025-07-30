@@ -11,7 +11,7 @@ export default function CreateExpenseCategoryForm() {
     e.preventDefault();
 
     try {
-      await axios.post('/api/expenses/categories', { name });
+      await axios.post('/expenses/categories', { name });
       toast.success('Category created successfully!');
       setName('');
     } catch (error: any) {

@@ -52,7 +52,7 @@ export default function CreateExpenseForm() {
     }
 
     try {
-      await axios.post('/api/expenses', {
+      await axios.post('/expenses', {
         description,
         amount: parseFloat(amount),
         date: date || null,
