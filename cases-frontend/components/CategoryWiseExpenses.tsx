@@ -24,7 +24,7 @@ export default function CategoryWiseExpenses() {
   useEffect(() => {
     async function fetchData() {
       try {
-        const categoriesRes = await axios.get('/api/expenses/categories');
+        const categoriesRes = await axios.get('/expenses/categories');
         const categories = categoriesRes.data;
 
         const allData: CategoryWithExpenses[] = await Promise.all(
