@@ -4,12 +4,6 @@ import { useEffect, useState, useRef } from 'react';
 import { toast } from 'react-toastify';
 import axios from '@/lib/axios';
 
-interface Expense {
-  description: string;
-  amount: number;
-  date?: string;
-}
-
 interface CategorySuggestion {
   id: string;
   category: string;
@@ -24,34 +18,35 @@ export default function ExpenseForm() {
   const [showSuggestions, setShowSuggestions] = useState(false);
   const [loading, setLoading] = useState(false);
   const [highlightedIndex, setHighlightedIndex] = useState<number>(-1);
+
   const inputRef = useRef<HTMLInputElement>(null);
-  const suggestionBoxRef = useRef<HTMLUListElement>(null);
+  const formRef = useRef<HTMLFormElement>(null);
 
   useEffect(() => {
     const fetchSuggestions = async () => {
       try {
         const res = await axios.get(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/expenses/categories`);
-        const data: CategorySuggestion[] = res.data;
+        const data = res.data.map((cat: any) => ({
+          id: cat._id,
+          category: cat.name,
+        }));
         setSuggestions(data);
       } catch (err) {
         console.error("Error fetching suggestions:", err);
         setSuggestions([]);
       }
     };
+    fetchSuggestions();
+  }, []);
 
-    fetchSuggestions(); // only once on mount
-  }, []); // <- empty dependency array: only once
-
-
-
-  // Handle keyboard navigation for suggestions
   useEffect(() => {
     if (!showSuggestions || suggestions.length === 0) return;
+
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === 'ArrowDown') {
-        setHighlightedIndex((prev) => (prev < suggestions.length - 1 ? prev + 1 : 0));
+        setHighlightedIndex(prev => (prev < suggestions.length - 1 ? prev + 1 : 0));
       } else if (e.key === 'ArrowUp') {
-        setHighlightedIndex((prev) => (prev > 0 ? prev - 1 : suggestions.length - 1));
+        setHighlightedIndex(prev => (prev > 0 ? prev - 1 : suggestions.length - 1));
       } else if (e.key === 'Enter' && highlightedIndex >= 0) {
         setCategory(suggestions[highlightedIndex].category);
         setShowSuggestions(false);
@@ -62,9 +57,9 @@ export default function ExpenseForm() {
         setHighlightedIndex(-1);
       }
     };
+
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-    // eslint-disable-next-line
   }, [showSuggestions, suggestions, highlightedIndex]);
 
   const handleCategorySelect = (cat: string) => {
@@ -77,24 +72,16 @@ export default function ExpenseForm() {
     e.preventDefault();
     setLoading(true);
 
-    interface ExpensePayload {
-      category: string;
-      description: string;
-      amount: number;
-      date?: string;
-    }
-
-    const payload: ExpensePayload = {
+    const payload = {
       category,
       description,
       amount: Number(amount),
+      ...(date && { date }),
     };
-
-    if (date) payload.date = date;
 
     try {
       await axios.post(`${process.env.NEXT_PUBLIC_API_BASE_URL}/expenses`, payload);
-
+      setCategory('');
       setDescription('');
       setAmount('');
       setDate('');
@@ -106,9 +93,6 @@ export default function ExpenseForm() {
       setLoading(false);
     }
   };
-
-  // To keep suggestion box inside form
-  const formRef = useRef<HTMLFormElement>(null);
 
   return (
     <form
@@ -135,7 +119,6 @@ export default function ExpenseForm() {
         />
         {showSuggestions && suggestions.length > 0 && (
           <ul
-            ref={suggestionBoxRef}
             className="absolute left-0 right-0 border bg-white rounded mt-1 max-h-40 overflow-y-auto shadow z-20"
             style={{ top: '100%' }}
           >
@@ -152,6 +135,7 @@ export default function ExpenseForm() {
           </ul>
         )}
       </div>
+
       <div>
         <label className="block font-medium mb-1">Description</label>
         <input
@@ -163,6 +147,7 @@ export default function ExpenseForm() {
           required
         />
       </div>
+
       <div>
         <label className="block font-medium mb-1">Amount</label>
         <input
@@ -175,6 +160,7 @@ export default function ExpenseForm() {
           min={0}
         />
       </div>
+
       <div>
         <label className="block font-medium mb-1">Date</label>
         <input
@@ -182,9 +168,9 @@ export default function ExpenseForm() {
           value={date}
           onChange={e => setDate(e.target.value)}
           className="border p-2 rounded w-full"
-          placeholder="Date"
         />
       </div>
+
       <button
         type="submit"
         className="bg-blue-600 text-white px-4 py-2 rounded hover:cursor-pointer"
