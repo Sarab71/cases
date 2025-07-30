@@ -44,6 +44,11 @@ public class ExpenseController {
         return ResponseEntity.ok(service.getExpensesByCategory(id));
     }
 
+    @GetMapping("/categories")
+    public ResponseEntity<List<ExpenseCategory>> getAllCategories() {
+        return ResponseEntity.ok(service.getAllCategories());
+    }
+
     @GetMapping("/total")
     public ResponseEntity<Map<String, Double>> getTotalExpenses(
             @RequestParam(required = false) String startDate,
