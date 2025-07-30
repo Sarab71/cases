@@ -11,6 +11,7 @@ interface CategorySuggestion {
 
 export default function ExpenseForm() {
   const [category, setCategory] = useState('');
+  const [categoryId, setCategoryId] = useState('');
   const [description, setDescription] = useState('');
   const [amount, setAmount] = useState('');
   const [date, setDate] = useState('');
@@ -52,9 +53,8 @@ export default function ExpenseForm() {
       } else if (e.key === 'ArrowUp') {
         setHighlightedIndex(prev => (prev > 0 ? prev - 1 : filteredSuggestions.length - 1));
       } else if (e.key === 'Enter' && highlightedIndex >= 0) {
-        setCategory(filteredSuggestions[highlightedIndex].category);
-        setShowSuggestions(false);
-        setHighlightedIndex(-1);
+        const selected = filteredSuggestions[highlightedIndex];
+        handleCategorySelect(selected);
         e.preventDefault();
       } else if (e.key === 'Escape') {
         setShowSuggestions(false);
@@ -66,8 +66,9 @@ export default function ExpenseForm() {
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [showSuggestions, filteredSuggestions, highlightedIndex]);
 
-  const handleCategorySelect = (cat: string) => {
-    setCategory(cat);
+  const handleCategorySelect = (cat: CategorySuggestion) => {
+    setCategory(cat.category);
+    setCategoryId(cat.id);
     setShowSuggestions(false);
     setHighlightedIndex(-1);
   };
@@ -77,7 +78,7 @@ export default function ExpenseForm() {
     setLoading(true);
 
     const payload = {
-      category,
+      categoryId,
       description,
       amount: Number(amount),
       ...(date && { date }),
@@ -86,6 +87,7 @@ export default function ExpenseForm() {
     try {
       await axios.post(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/expenses`, payload);
       setCategory('');
+      setCategoryId('');
       setDescription('');
       setAmount('');
       setDate('');
@@ -113,10 +115,10 @@ export default function ExpenseForm() {
           value={category}
           onChange={e => {
             setCategory(e.target.value);
-            setShowSuggestions(true);
+            setCategoryId('');
+            setShowSuggestions(e.target.value.trim().length > 0);
             setHighlightedIndex(-1);
           }}
-          onFocus={() => setShowSuggestions(true)}
           className="border p-2 rounded w-full"
           placeholder="Enter or select category"
           autoComplete="off"
@@ -130,7 +132,7 @@ export default function ExpenseForm() {
               <li
                 key={s.id}
                 className={`p-2 cursor-pointer ${highlightedIndex === idx ? 'bg-blue-100' : 'hover:bg-blue-50'}`}
-                onMouseDown={() => handleCategorySelect(s.category)}
+                onMouseDown={() => handleCategorySelect(s)}
                 onMouseEnter={() => setHighlightedIndex(idx)}
               >
                 {s.category}
