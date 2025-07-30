@@ -7,5 +7,5 @@ import org.springframework.data.mongodb.repository.MongoRepository;
 import com.cases.model.ExpenseCategory;
 
 public interface ExpenseCategoryRepository extends MongoRepository<ExpenseCategory, String> {
-    Optional<ExpenseCategory> findByCategory(String category);
+    Optional<ExpenseCategory> findByName(String name);
 }

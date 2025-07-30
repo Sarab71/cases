@@ -1,20 +1,22 @@
 package com.cases.controller;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.cases.dto.ExpenseRequestDTO;
-import com.cases.dto.ExpenseUpdateDto;
+import com.cases.dto.CreateExpenseCategoryDto;
+import com.cases.dto.CreateExpenseDto;
+import com.cases.model.Expense;
 import com.cases.model.ExpenseCategory;
 import com.cases.service.ExpenseService;
 
@@ -25,71 +27,49 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class ExpenseController {
 
-    private final ExpenseService expenseService;
+    private final ExpenseService service;
 
     @PostMapping
-    public ResponseEntity<ExpenseCategory> addExpense(@RequestBody ExpenseRequestDTO dto) {
-        try {
-            ExpenseCategory saved = expenseService.addExpense(dto);
-            return ResponseEntity.status(201).body(saved);
-        } catch (IllegalArgumentException e) {
-            return ResponseEntity.badRequest().body(null);
-        }
+    public ResponseEntity<Expense> createExpense(@RequestBody CreateExpenseDto dto) {
+        return ResponseEntity.ok(service.createExpense(dto));
     }
 
-    @GetMapping
-    public ResponseEntity<List<ExpenseCategory>> getAllExpenses() {
-        return ResponseEntity.ok(expenseService.getAllExpenses());
+    @PostMapping("/categories")
+    public ResponseEntity<ExpenseCategory> createCategory(@RequestBody CreateExpenseCategoryDto dto) {
+        return ResponseEntity.ok(service.createCategory(dto));
+    }
+
+    @GetMapping("/category/{id}")
+    public ResponseEntity<List<Expense>> getExpensesByCategory(@PathVariable String id) {
+        return ResponseEntity.ok(service.getExpensesByCategory(id));
     }
 
     @GetMapping("/total")
     public ResponseEntity<Map<String, Double>> getTotalExpenses(
             @RequestParam(required = false) String startDate,
             @RequestParam(required = false) String endDate) {
-        double total = expenseService.getTotalExpensesInDateRange(startDate, endDate);
+        LocalDate start = (startDate != null && !startDate.isEmpty())
+                ? LocalDate.parse(startDate)
+                : LocalDate.of(1970, 1, 1);
+
+        LocalDate end = (endDate != null && !endDate.isEmpty())
+                ? LocalDate.parse(endDate)
+                : LocalDate.now();
+
+        double total = service.getTotalBetweenDates(start, end);
         return ResponseEntity.ok(Map.of("totalExpenses", total));
     }
 
-    @GetMapping("/categories")
-    public ResponseEntity<List<Map<String, String>>> getCategorySuggestions(@RequestParam String query) {
-        List<String> suggestions = expenseService.getCategorySuggestions(query);
-
-        List<Map<String, String>> response = suggestions.stream()
-                .map(cat -> Map.of("id", cat, "category", cat))
-                .toList();
-
-        return ResponseEntity.ok(response);
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deleteExpense(@PathVariable String id) {
+        service.deleteExpense(id);
+        return ResponseEntity.noContent().build();
     }
 
-    @PatchMapping
-    public ResponseEntity<?> updateExpense(@RequestBody ExpenseUpdateDto dto) {
-        try {
-            ExpenseCategory updated = expenseService.updateExpense(dto);
-            return ResponseEntity.ok(updated);
-        } catch (IllegalArgumentException e) {
-            return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
-        }
+    @DeleteMapping("/categories/{id}")
+    public ResponseEntity<Void> deleteCategory(@PathVariable String id) {
+        service.deleteCategory(id);
+        return ResponseEntity.noContent().build();
     }
 
-    @DeleteMapping
-    public ResponseEntity<?> deleteExpense(
-            @RequestParam String category,
-            @RequestParam int index) {
-        try {
-            ExpenseCategory updated = expenseService.deleteExpense(category, index);
-            return ResponseEntity.ok(updated);
-        } catch (IllegalArgumentException e) {
-            return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
-        }
-    }
-
-    @DeleteMapping("/category")
-    public ResponseEntity<?> deleteCategory(@RequestParam String category) {
-        try {
-            expenseService.deleteCategory(category);
-            return ResponseEntity.ok(Map.of("message", "Category deleted successfully"));
-        } catch (IllegalArgumentException e) {
-            return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
-        }
-    }
 }

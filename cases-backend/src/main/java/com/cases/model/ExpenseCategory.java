@@ -1,7 +1,5 @@
 package com.cases.model;
 
-import java.util.List;
-
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
@@ -20,18 +18,5 @@ public class ExpenseCategory {
     @Id
     private String id;
 
-    private String category;
-
-    private List<Expense> expenses;
-
-    // Embedded class for Expense
-    @Data
-    @NoArgsConstructor
-    @AllArgsConstructor
-    @Builder
-    public static class Expense {
-        private String description;
-        private double amount;
-        private String date; // You can also use `LocalDate` or `Date`
-    }
+    private String name;
 }

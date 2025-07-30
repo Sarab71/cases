@@ -1,18 +1,18 @@
 package com.cases.service;
 
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
+import java.time.LocalDate;
 import java.util.List;
-import java.util.Optional;
 
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
-import com.cases.dto.ExpenseRequestDTO;
-import com.cases.dto.ExpenseUpdateDto;
+import com.cases.dto.CreateExpenseCategoryDto;
+import com.cases.dto.CreateExpenseDto;
+import com.cases.model.Expense;
 import com.cases.model.ExpenseCategory;
 import com.cases.repository.ExpenseCategoryRepository;
+import com.cases.repository.ExpenseRepository;
 
 import lombok.RequiredArgsConstructor;
 
@@ -20,124 +20,66 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class ExpenseService {
 
-    private final ExpenseCategoryRepository categoryRepository;
+    private final ExpenseCategoryRepository categoryRepo;
+    private final ExpenseRepository expenseRepo;
 
-    public ExpenseCategory addExpense(ExpenseRequestDTO dto) {
-        if (dto.getCategory() == null || dto.getDescription() == null || dto.getAmount() == 0) {
-            throw new IllegalArgumentException("Missing fields");
+    public ExpenseCategory createCategory(CreateExpenseCategoryDto dto) {
+        if (categoryRepo.findByName(dto.getName()).isPresent()) {
+            throw new IllegalArgumentException("Category already exists");
+        }
+        ExpenseCategory category = ExpenseCategory.builder()
+                .name(dto.getName())
+                .build();
+        return categoryRepo.save(category);
+    }
+
+    public Expense createExpense(CreateExpenseDto dto) {
+        if (!categoryRepo.existsById(dto.getCategoryId())) {
+            throw new IllegalArgumentException("Invalid category ID");
         }
 
-        ExpenseCategory.Expense expense = ExpenseCategory.Expense.builder()
+        Expense expense = Expense.builder()
                 .description(dto.getDescription())
                 .amount(dto.getAmount())
-                .date(dto.getDate() != null ? dto.getDate() : new Date().toInstant().toString().substring(0, 10)) // fallback
-                                                                                                                  // to
-                                                                                                                  // today
+                .date(dto.getDate() != null ? dto.getDate() : LocalDate.now())
+                .categoryId(dto.getCategoryId())
                 .build();
 
-        Optional<ExpenseCategory> optionalCategory = categoryRepository.findByCategory(dto.getCategory());
+        return expenseRepo.save(expense);
+    }
 
-        ExpenseCategory category;
-        if (optionalCategory.isPresent()) {
-            category = optionalCategory.get();
-            category.getExpenses().add(expense);
-        } else {
-            category = ExpenseCategory.builder()
-                    .category(dto.getCategory())
-                    .expenses(new ArrayList<>(List.of(expense)))
-                    .build();
+    public List<ExpenseCategory> getAllCategories() {
+        return categoryRepo.findAll();
+    }
+
+    public List<Expense> getExpensesByCategory(String categoryId) {
+        return expenseRepo.findByCategoryId(categoryId);
+    }
+
+    public double getTotalBetweenDates(LocalDate start, LocalDate end) {
+        return expenseRepo.findByDateRange(start, end)
+                .stream()
+                .mapToDouble(Expense::getAmount)
+                .sum();
+    }
+
+    public void deleteExpense(String id) {
+        if (!expenseRepo.existsById(id)) {
+            throw new IllegalArgumentException("Expense not found");
+        }
+        expenseRepo.deleteById(id);
+    }
+
+    public void deleteCategory(String id) {
+        if (!categoryRepo.existsById(id)) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Category not found");
         }
 
-        return categoryRepository.save(category);
-    }
+        // Delete all expenses under this category
+        List<Expense> expenses = expenseRepo.findByCategoryId(id);
+        expenseRepo.deleteAll(expenses);
 
-    public List<ExpenseCategory> getAllExpenses() {
-        return categoryRepository.findAll();
-    }
-
-    public double getTotalExpensesInDateRange(String startDate, String endDate) {
-        List<ExpenseCategory> categories = categoryRepository.findAll();
-        double total = 0;
-
-        for (ExpenseCategory category : categories) {
-            for (ExpenseCategory.Expense expense : category.getExpenses()) {
-                String dateStr = expense.getDate();
-                if (dateStr == null)
-                    continue;
-
-                try {
-                    Date date = new SimpleDateFormat("yyyy-MM-dd").parse(dateStr);
-
-                    Date start = (startDate != null) ? new SimpleDateFormat("yyyy-MM-dd").parse(startDate) : null;
-                    Date end = (endDate != null) ? new SimpleDateFormat("yyyy-MM-dd").parse(endDate) : null;
-                    if (end != null) {
-                        Calendar c = Calendar.getInstance();
-                        c.setTime(end);
-                        c.add(Calendar.DATE, 1);
-                        end = c.getTime(); // include full end date
-                    }
-
-                    if ((start == null || !date.before(start)) && (end == null || date.before(end))) {
-                        total += expense.getAmount();
-                    }
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-            }
-        }
-
-        return total;
-    }
-
-    public ExpenseCategory updateExpense(ExpenseUpdateDto dto) {
-        Optional<ExpenseCategory> optional = categoryRepository.findByCategory(dto.getCategory());
-        if (optional.isEmpty())
-            throw new IllegalArgumentException("Category not found");
-
-        ExpenseCategory category = optional.get();
-
-        if (dto.getIndex() < 0 || dto.getIndex() >= category.getExpenses().size()) {
-            throw new IllegalArgumentException("Invalid index");
-        }
-
-        ExpenseCategory.Expense updated = ExpenseCategory.Expense.builder()
-                .description(dto.getDescription())
-                .amount(dto.getAmount())
-                .date(dto.getDate())
-                .build();
-
-        category.getExpenses().set(dto.getIndex(), updated);
-        return categoryRepository.save(category);
-    }
-
-    public ExpenseCategory deleteExpense(String categoryName, int index) {
-        Optional<ExpenseCategory> optional = categoryRepository.findByCategory(categoryName);
-        if (optional.isEmpty())
-            throw new IllegalArgumentException("Category not found");
-
-        ExpenseCategory category = optional.get();
-        if (index < 0 || index >= category.getExpenses().size()) {
-            throw new IllegalArgumentException("Invalid index");
-        }
-
-        category.getExpenses().remove(index);
-        return categoryRepository.save(category);
-    }
-
-    public List<String> getCategorySuggestions(String query) {
-        return categoryRepository.findAll().stream()
-                .map(ExpenseCategory::getCategory)
-                .filter(cat -> cat.toLowerCase().contains(query.toLowerCase()))
-                .distinct()
-                .toList();
-    }
-
-    public void deleteCategory(String categoryName) {
-        Optional<ExpenseCategory> optional = categoryRepository.findByCategory(categoryName);
-        if (optional.isEmpty()) {
-            throw new IllegalArgumentException("Category not found");
-        }
-        categoryRepository.delete(optional.get());
+        categoryRepo.deleteById(id);
     }
 
 }
