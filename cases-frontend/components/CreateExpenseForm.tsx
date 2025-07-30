@@ -20,7 +20,7 @@ export default function CreateExpenseForm() {
   const [showDropdown, setShowDropdown] = useState(false);
 
   useEffect(() => {
-    axios.get('/api/expenses/categories')
+    axios.get('/expenses/categories')
       .then(res => setCategories(res.data))
       .catch(err => toast.error('Failed to load categories'));
   }, []);

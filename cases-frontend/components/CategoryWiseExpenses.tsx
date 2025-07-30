@@ -29,7 +29,7 @@ export default function CategoryWiseExpenses() {
 
         const allData: CategoryWithExpenses[] = await Promise.all(
           categories.map(async (cat: any) => {
-            const expensesRes = await axios.get(`/api/expenses/by-category/${cat.id}`);
+            const expensesRes = await axios.get(`/expenses/by-category/${cat.id}`);
             return {
               id: cat.id,
               name: cat.name,
