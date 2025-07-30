@@ -29,14 +29,8 @@ export default function ExpenseForm() {
 
   useEffect(() => {
     const fetchSuggestions = async () => {
-      if (!category.trim()) {
-        setSuggestions([]);
-        return;
-      }
-
       try {
         const res = await axios.get(`${process.env.NEXT_PUBLIC_API_BASE_URL}/expenses/categories`);
-
         const data: CategorySuggestion[] = res.data;
         setSuggestions(data);
       } catch (err) {
@@ -45,12 +39,9 @@ export default function ExpenseForm() {
       }
     };
 
-    const delayDebounce = setTimeout(() => {
-      fetchSuggestions();
-    }, 300); // debounce
+    fetchSuggestions(); // only once on mount
+  }, []); // <- empty dependency array: only once
 
-    return () => clearTimeout(delayDebounce);
-  }, [category]);
 
 
   // Handle keyboard navigation for suggestions
