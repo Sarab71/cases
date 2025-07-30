@@ -51,13 +51,17 @@ export default function CreateExpenseForm() {
       return;
     }
 
+    const payload = {
+      description,
+      amount: parseFloat(amount),
+      date: date || null,
+      categoryId: selectedCategoryId
+    };
+
+    console.log('Submitting expense payload:', payload); // 👈 LOG HERE
+
     try {
-      await axios.post('/expenses', {
-        description,
-        amount: parseFloat(amount),
-        date: date || null,
-        categoryId: selectedCategoryId
-      });
+      await axios.post('/expenses', payload);
 
       toast.success('Expense created');
       // Reset
@@ -68,6 +72,7 @@ export default function CreateExpenseForm() {
       setSelectedCategoryId(null);
     } catch (err) {
       toast.error('Failed to create expense');
+      console.error('Create expense error:', err); // 👈 Also log the actual error
     }
   };
 
