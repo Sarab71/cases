@@ -1,100 +1,84 @@
 'use client';
 
-import axios from '@/lib/axios';
 import { useEffect, useState } from 'react';
+import axios from '@/lib/axios';
 import { toast } from 'react-toastify';
 
-
 interface Expense {
-    id: string;
-    description: string;
-    amount: number;
-    date: string;
+  id: string;
+  description: string;
+  amount: number;
+  date: string;
 }
 
-interface Category {
-    id: string;
-    category: string;
-    expenses: Expense[];
+interface CategoryWithExpenses {
+  id: string;
+  name: string;
+  expenses: Expense[];
 }
 
-export default function ExpensesList() {
-    const [categories, setCategories] = useState<Category[]>([]);
+export default function CategoryWiseExpenses() {
+  const [data, setData] = useState<CategoryWithExpenses[]>([]);
+  const [loading, setLoading] = useState(true);
 
-    const fetchExpenses = async () => {
-        try {
-            const res = await axios.get('/expenses');
-            setCategories(res.data);
-        } catch (err: any) {
-            toast.error('Failed to load expenses.');
-        }
-    };
+  useEffect(() => {
+    async function fetchData() {
+      try {
+        const categoriesRes = await axios.get('/api/expenses/categories');
+        const categories = categoriesRes.data;
 
-    const handleDelete = async (category: string, index: number) => {
-        if (!confirm('Are you sure you want to delete this expense?')) return;
+        const allData: CategoryWithExpenses[] = await Promise.all(
+          categories.map(async (cat: any) => {
+            const expensesRes = await axios.get(`/api/expenses/by-category/${cat.id}`);
+            return {
+              id: cat.id,
+              name: cat.name,
+              expenses: expensesRes.data,
+            };
+          })
+        );
 
-        try {
-            await axios.delete('/expenses', {
-                params: { category, index }
-            });
+        setData(allData);
+      } catch (err) {
+        toast.error('Failed to load expenses');
+      } finally {
+        setLoading(false);
+      }
+    }
 
-            fetchExpenses(); // Refresh list after delete
-        } catch (err: any) {
-            toast.error('Failed to delete expense.');
-        }
-    };
+    fetchData();
+  }, []);
 
-    const handleDeleteCategory = async (category: string) => {
-        if (!confirm(`Delete entire category "${category}"? This cannot be undone.`)) return;
+  if (loading) return <p className="p-4">Loading...</p>;
 
-        try {
-            await axios.delete('/expenses/category', {
-                params: { category }
-            });
+  if (data.length === 0) return <p className="p-4">No categories found.</p>;
 
-            fetchExpenses(); // Refresh list after category delete
-        } catch (err: any) {
-            toast.error('Failed to delete category.');
-        }
-    };
+  return (
+    <div className="space-y-6 p-4">
+      <h2 className="text-2xl font-semibold mb-4">Expenses by Category</h2>
 
-    useEffect(() => {
-        fetchExpenses();
-    }, []);
+      {data.map(category => (
+        <div key={category.id} className="border rounded-lg shadow-sm p-4">
+          <h3 className="text-lg font-bold mb-2">{category.name}</h3>
 
-    return (
-        <div>
-            <h2 className="text-xl font-bold mb-4">Expenses</h2>
-            {categories.map(category => (
-                <div key={category.id} className="mb-6 border border-gray-200 rounded p-4">
-                    <div className="flex justify-between items-center mb-2">
-                        <h3 className="text-lg font-semibold">{category.category}</h3>
-                        <button
-                            onClick={() => handleDeleteCategory(category.category)}
-                            className="text-red-600 text-sm hover:underline cursor-pointer"
-                        >
-                            Delete Category
-                        </button>
-                    </div>
+          {category.expenses.length === 0 ? (
+            <p className="text-gray-500">No expenses</p>
+          ) : (
+            <ul className="divide-y">
+              {category.expenses.map(exp => (
+                <li key={exp.id} className="py-2 flex justify-between text-sm">
+                  <span>{exp.description}</span>
+                  <span>₹{exp.amount.toFixed(2)}</span>
+                </li>
+              ))}
+            </ul>
+          )}
 
-                    <ul>
-                        {category.expenses.map((expense, index) => (
-                            <li key={`${expense.description}-${index}`} className="flex justify-between items-center border-b py-1">
-                                <div>
-                                    <p>{expense.description} - ₹{expense.amount}</p>
-                                    <small>{new Date(expense.date).toLocaleDateString()}</small>
-                                </div>
-                                <button
-                                    onClick={() => handleDelete(category.category, index)}
-                                    className="text-red-500 hover:underline text-sm cursor-pointer"
-                                >
-                                    Delete
-                                </button>
-                            </li>
-                        ))}
-                    </ul>
-                </div>
-            ))}
+          <div className="mt-2 text-right font-semibold">
+            Total: ₹{category.expenses.reduce((sum, e) => sum + e.amount, 0).toFixed(2)}
+          </div>
         </div>
-    );
+      ))}
+    </div>
+  );
 }
