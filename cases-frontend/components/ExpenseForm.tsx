@@ -30,7 +30,7 @@ export default function ExpenseForm() {
   useEffect(() => {
     const fetchSuggestions = async () => {
       try {
-        const res = await axios.get(`${process.env.NEXT_PUBLIC_API_BASE_URL}/expenses/categories`);
+        const res = await axios.get(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/expenses/categories`);
         const data: CategorySuggestion[] = res.data;
         setSuggestions(data);
       } catch (err) {
