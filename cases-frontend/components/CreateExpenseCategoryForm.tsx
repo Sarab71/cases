@@ -4,7 +4,12 @@ import { useState } from 'react';
 import axios from '@/lib/axios';
 import { toast } from 'react-toastify';
 
-export default function CreateExpenseCategoryForm() {
+interface Props {
+  onCategoryAdded?: () => void;
+}
+
+
+export default function CreateExpenseCategoryForm({onCategoryAdded}: Props) {
   const [name, setName] = useState('');
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -14,6 +19,7 @@ export default function CreateExpenseCategoryForm() {
       await axios.post('/expenses/categories', { name });
       toast.success('Category created successfully!');
       setName('');
+      if(onCategoryAdded) onCategoryAdded();
     } catch (error: any) {
       const message =
         error?.response?.data?.message || 'Error creating category.';

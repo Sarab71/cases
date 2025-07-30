@@ -4,6 +4,9 @@ import { useEffect, useState } from 'react';
 import axios from '@/lib/axios';
 import { toast } from 'react-toastify';
 
+interface CategoryWiseExpensesProps {
+  refreshTrigger?: number;
+}
 interface Expense {
   id: string;
   description: string;
@@ -17,7 +20,7 @@ interface CategoryWithExpenses {
   expenses: Expense[];
 }
 
-export default function CategoryWiseExpenses() {
+export default function CategoryWiseExpenses({refreshTrigger}: CategoryWiseExpensesProps) {
   const [data, setData] = useState<CategoryWithExpenses[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -48,7 +51,7 @@ export default function CategoryWiseExpenses() {
     }
 
     fetchData();
-  }, []);
+  }, [refreshTrigger]);
 
   if (loading) return <p className="p-4">Loading...</p>;
 
@@ -68,8 +71,10 @@ export default function CategoryWiseExpenses() {
             <ul className="divide-y">
               {category.expenses.map(exp => (
                 <li key={exp.id} className="py-2 flex justify-between text-sm">
+                  <span>{exp.date}</span>
                   <span>{exp.description}</span>
                   <span>₹{exp.amount.toFixed(2)}</span>
+
                 </li>
               ))}
             </ul>

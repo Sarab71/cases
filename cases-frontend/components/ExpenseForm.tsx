@@ -4,12 +4,16 @@ import { useEffect, useState, useRef } from 'react';
 import { toast } from 'react-toastify';
 import axios from '@/lib/axios';
 
+interface ExpenseFormProps {
+  onExpenseAdded?: () => void;
+  refreshCategoryTrigger?:number;
+}
 interface CategorySuggestion {
   id: string;
   category: string;
 }
 
-export default function ExpenseForm() {
+export default function ExpenseForm({onExpenseAdded, refreshCategoryTrigger}: ExpenseFormProps) {
   const [category, setCategory] = useState('');
   const [categoryId, setCategoryId] = useState('');
   const [description, setDescription] = useState('');
@@ -28,10 +32,9 @@ export default function ExpenseForm() {
       try {
         const res = await axios.get(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/expenses/categories`);
         const data = res.data.map((cat: any) => ({
-          id: cat._id,
+          id: cat.id,
           category: cat.name,
         }));
-         console.log("Fetched suggestions:", data);
         setSuggestions(data);
       } catch (err) {
         console.error("Error fetching suggestions:", err);
@@ -39,7 +42,7 @@ export default function ExpenseForm() {
       }
     };
     fetchSuggestions();
-  }, []);
+  }, [refreshCategoryTrigger]);
 
   const filteredSuggestions = suggestions.filter(s =>
     s.category.toLowerCase().includes(category.toLowerCase())
@@ -68,7 +71,6 @@ export default function ExpenseForm() {
   }, [showSuggestions, filteredSuggestions, highlightedIndex]);
 
   const handleCategorySelect = (cat: CategorySuggestion) => {
-    console.log("Selected category:", cat);
     setCategory(cat.category);
     setCategoryId(cat.id);
     setShowSuggestions(false);
@@ -79,13 +81,18 @@ export default function ExpenseForm() {
     e.preventDefault();
     setLoading(true);
 
+      if (!categoryId) {
+    toast.error("Please select a category from the list");
+    setLoading(false);
+    return;
+  }
+
     const payload = {
       categoryId,
       description,
       amount: Number(amount),
       ...(date && { date }),
     };
-    console.log("Submitting expense with payload:", payload); // 👈 log
 
     try {
       await axios.post(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/expenses`, payload);
@@ -95,6 +102,7 @@ export default function ExpenseForm() {
       setAmount('');
       setDate('');
       toast.success('Expense added!');
+      onExpenseAdded?.();
     } catch (error) {
       console.error("Error adding expense:", error);
       toast.error('Failed to add expense');
