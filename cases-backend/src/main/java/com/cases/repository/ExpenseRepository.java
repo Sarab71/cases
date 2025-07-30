@@ -14,8 +14,7 @@ public interface ExpenseRepository extends MongoRepository<Expense, String> {
 
     List<Expense> findByCategoryId(String categoryId);
 
-    @Query("{ 'date': { $gte: ?0, $lte: ?1 } }")
-    List<Expense> findByDateRange(LocalDate start, LocalDate end);
+    List<Expense> findByDateBetween(LocalDate startDate, LocalDate endDate);
 
     @Query("{ 'categoryId': ?0, 'date': { $gte: ?1, $lte: ?2 } }")
     List<Expense> findByCategoryIdAndDateRange(String categoryId, LocalDate start, LocalDate end);

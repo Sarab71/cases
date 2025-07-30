@@ -57,7 +57,7 @@ public class ExpenseService {
     }
 
     public double getTotalBetweenDates(LocalDate start, LocalDate end) {
-        return expenseRepo.findByDateRange(start, end)
+        return expenseRepo.findByDateBetween(start, end)
                 .stream()
                 .mapToDouble(Expense::getAmount)
                 .sum();

@@ -18,6 +18,7 @@ import com.cases.dto.CreateExpenseCategoryDto;
 import com.cases.dto.CreateExpenseDto;
 import com.cases.model.Expense;
 import com.cases.model.ExpenseCategory;
+import com.cases.repository.ExpenseRepository;
 import com.cases.service.ExpenseService;
 
 import lombok.RequiredArgsConstructor;
@@ -28,6 +29,7 @@ import lombok.RequiredArgsConstructor;
 public class ExpenseController {
 
     private final ExpenseService service;
+    private final ExpenseRepository expenseRepository;
 
     @PostMapping
     public ResponseEntity<Expense> createExpense(@RequestBody CreateExpenseDto dto) {
@@ -50,19 +52,31 @@ public class ExpenseController {
     }
 
     @GetMapping("/total")
-    public ResponseEntity<Map<String, Double>> getTotalExpenses(
+    public ResponseEntity<?> getTotalExpenses(
             @RequestParam(required = false) String startDate,
             @RequestParam(required = false) String endDate) {
-        LocalDate start = (startDate != null && !startDate.isEmpty())
-                ? LocalDate.parse(startDate)
-                : LocalDate.of(1970, 1, 1);
+        try {
+            List<Expense> expenses;
 
-        LocalDate end = (endDate != null && !endDate.isEmpty())
-                ? LocalDate.parse(endDate)
-                : LocalDate.now();
+            if (startDate != null && endDate != null) {
+                LocalDate start = LocalDate.parse(startDate);
+                LocalDate end = LocalDate.parse(endDate).plusDays(1);
 
-        double total = service.getTotalBetweenDates(start, end);
-        return ResponseEntity.ok(Map.of("totalExpenses", total));
+                expenses = expenseRepository.findByDateBetween(start, end);
+            } else {
+                expenses = expenseRepository.findAll();
+            }
+
+            double totalExpenses = expenses.stream()
+                    .mapToDouble(Expense::getAmount)
+                    .sum();
+
+            return ResponseEntity.ok(Map.of(
+                    "totalExpenses", totalExpenses,
+                    "count", expenses.size()));
+        } catch (Exception e) {
+            return ResponseEntity.internalServerError().body("Error calculating total expenses: " + e.getMessage());
+        }
     }
 
     @DeleteMapping("/{id}")
