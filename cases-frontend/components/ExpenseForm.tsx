@@ -80,7 +80,7 @@ export default function ExpenseForm() {
     };
 
     try {
-      await axios.post(`${process.env.NEXT_PUBLIC_API_BASE_URL}/expenses`, payload);
+      await axios.post(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/expenses`, payload);
       setCategory('');
       setDescription('');
       setAmount('');
