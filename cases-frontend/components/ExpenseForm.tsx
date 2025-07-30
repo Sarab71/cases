@@ -31,6 +31,7 @@ export default function ExpenseForm() {
           id: cat._id,
           category: cat.name,
         }));
+         console.log("Fetched suggestions:", data);
         setSuggestions(data);
       } catch (err) {
         console.error("Error fetching suggestions:", err);
@@ -67,6 +68,7 @@ export default function ExpenseForm() {
   }, [showSuggestions, filteredSuggestions, highlightedIndex]);
 
   const handleCategorySelect = (cat: CategorySuggestion) => {
+    console.log("Selected category:", cat);
     setCategory(cat.category);
     setCategoryId(cat.id);
     setShowSuggestions(false);
@@ -83,6 +85,7 @@ export default function ExpenseForm() {
       amount: Number(amount),
       ...(date && { date }),
     };
+    console.log("Submitting expense with payload:", payload); // 👈 log
 
     try {
       await axios.post(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/expenses`, payload);
