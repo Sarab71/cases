@@ -157,6 +157,7 @@ export default function EditBillForm({ billId, onClose, onUpdated }: EditBillFor
           customer,
           items: processedItems,
           grandTotal,
+          totalQty,
           date: new Date(editDate).toLocaleDateString(),
         },
         {

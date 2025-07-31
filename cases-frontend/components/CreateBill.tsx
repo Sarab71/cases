@@ -218,6 +218,7 @@ export default function CreateBillForm() {
           customer: selectedCustomer,
           items: processedItems,
           grandTotal,
+          totalQty,
           date: new Date(billDate).toLocaleDateString(),
         },
         {
