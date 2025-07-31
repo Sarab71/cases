@@ -144,7 +144,13 @@ export default function EditBillForm({ billId, onClose, onUpdated }: EditBillFor
 
     const processedItems = items.map((item) => {
       const totalAmount = calculateTotalAmount(item);
-      return { ...item, totalAmount: Number(totalAmount.toFixed(2)) };
+      const discount = isNaN(Number(item.discount)) ? 0 : Number(item.discount);
+
+      return {
+        ...item,
+        totalAmount: Number(totalAmount.toFixed(2)),
+        discount: discount ? discount : "",
+      };
     });
 
     const grandTotal = processedItems.reduce((sum, item) => sum + item.totalAmount!, 0);

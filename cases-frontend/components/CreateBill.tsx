@@ -199,7 +199,8 @@ export default function CreateBillForm() {
     const processedItems = items.map((item) => {
       const quantity = Number(item.quantity) || 0;
       const rate = Number(item.rate) || 0;
-      const discount = Number(item.discount) || 0;
+      const rawDiscount = item.discount;
+      const discount = isNaN(Number(rawDiscount)) ? 0 : Number(rawDiscount);
       const discountAmount = (rate * discount) / 100;
       const netPrice = rate - discountAmount;
       const totalAmount = netPrice * quantity;
@@ -207,6 +208,7 @@ export default function CreateBillForm() {
       return {
         ...item,
         totalAmount: Number(totalAmount.toFixed(2)),
+        discount: !discount ? "" : discount,
       };
     });
 
