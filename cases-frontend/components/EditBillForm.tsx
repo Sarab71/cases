@@ -1,8 +1,8 @@
 'use client';
 
+import axios from '@/lib/axios';
 import { useEffect, useState } from 'react';
 import { toast } from 'react-toastify';
-import axios from '@/lib/axios';
 
 interface Item {
   modelNumber: string;

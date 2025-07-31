@@ -1,7 +1,7 @@
 'use client';
 
-import { createContext, useContext, useEffect, useState } from 'react';
 import { loadingRef } from '@/lib/loadingStore';
+import { createContext, useContext, useEffect, useState } from 'react';
 
 const LoadingContext = createContext<{ loading: boolean; progress: number }>({ loading: false, progress: 0 });
 

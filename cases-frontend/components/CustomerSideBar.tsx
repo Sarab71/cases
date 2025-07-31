@@ -1,7 +1,7 @@
 'use client';
 
-import { useEffect, useState } from 'react';
 import axios from '@/lib/axios';
+import { useEffect, useState } from 'react';
 
 interface Customer {
   id: string;

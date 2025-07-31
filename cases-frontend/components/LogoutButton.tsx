@@ -1,8 +1,8 @@
 'use client';
 
-import { useState } from 'react';
-import { useRouter } from 'next/navigation';
 import LoadingBar from '@/components/LoadingBar'; // adjust the path if needed
+import { useRouter } from 'next/navigation';
+import { useState } from 'react';
 
 export default function LogoutButton() {
   const router = useRouter();

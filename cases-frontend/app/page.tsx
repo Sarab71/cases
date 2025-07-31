@@ -1,12 +1,12 @@
 "use client";
 
-import { useState, useEffect } from 'react';
-import TotalOutstanding from '@/components/TotalOutstanding';
 import PaymentsReceived from '@/components/PaymentsReceived';
-import TotalSales from '@/components/TotalSales';
-import TotalExpenses from '@/components/TotalExpenses';
 import TodayDueSidebar from '@/components/TodayDueSideBar';
+import TotalExpenses from '@/components/TotalExpenses';
+import TotalOutstanding from '@/components/TotalOutstanding';
+import TotalSales from '@/components/TotalSales';
 import axios from '@/lib/axios';
+import { useEffect, useState } from 'react';
 
 export default function Home() {
   const [startDate, setStartDate] = useState('');

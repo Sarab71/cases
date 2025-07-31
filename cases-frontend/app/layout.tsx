@@ -1,11 +1,10 @@
 'use client';
-import "./globals.css";
 import Header from '@/components/Header';
-import Spinner from '@/components/LoadingBar';
+import LoadingBar from "@/components/LoadingBar";
+import { LoadingProvider, useLoading } from '@/context/LoadingContext';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import { LoadingProvider, useLoading } from '@/context/LoadingContext';
-import LoadingBar from "@/components/LoadingBar";
+import "./globals.css";
 
 function GlobalSpinner() {
   const { loading } = useLoading();

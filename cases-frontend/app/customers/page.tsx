@@ -1,9 +1,9 @@
 'use client';
 
-import { useState } from 'react';
 import CustomerSideBar from '@/components/CustomerSideBar';
 import CustomerStatement from '@/components/CustomerStatement';
 import EditCustomerForm from '@/components/EditCustomerForm';
+import { useState } from 'react';
 
 export default function CustomersPage() {
   const [selectedCustomerId, setSelectedCustomerId] = useState<string | null>(null);

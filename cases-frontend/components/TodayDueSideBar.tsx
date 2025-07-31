@@ -1,8 +1,8 @@
 'use client';
 
-import { useEffect, useState } from 'react';
 import axios from '@/lib/axios';
 import { format } from 'date-fns';
+import { useEffect, useState } from 'react';
 
 interface Bill {
   id: string;

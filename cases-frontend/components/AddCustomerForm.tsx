@@ -1,7 +1,7 @@
 'use client';
+import axios from '@/lib/axios';
 import { useState } from 'react';
 import { toast } from 'react-toastify';
-import axios from '@/lib/axios';
 
 export default function AddCustomerForm() {
   const [name, setName] = useState('');
