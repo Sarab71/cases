@@ -237,7 +237,7 @@ export default function EditBillForm({ billId, onClose, onUpdated }: EditBillFor
                 <td className="border p-2">
                   <input
                     type="number"
-                    value={item.quantity}
+                    value={item.quantity === 0 ? '' : item.quantity}
                     onChange={(e) => handleItemChange(index, 'quantity', e.target.value)}
                     className="border p-1 rounded w-full"
                   />
@@ -245,7 +245,7 @@ export default function EditBillForm({ billId, onClose, onUpdated }: EditBillFor
                 <td className="border p-2">
                   <input
                     type="number"
-                    value={item.rate}
+                    value={item.rate === 0 ? '' : item.rate}
                     onChange={(e) => handleItemChange(index, 'rate', e.target.value)}
                     className="border p-1 rounded w-full"
                   />
@@ -253,7 +253,7 @@ export default function EditBillForm({ billId, onClose, onUpdated }: EditBillFor
                 <td className="border p-2">
                   <input
                     type="number"
-                    value={item.discount ?? 0}
+                    value={item.discount === 0 ? '' : item.discount}
                     onChange={(e) => handleItemChange(index, 'discount', e.target.value)}
                     className="border p-1 rounded w-full"
                   />
