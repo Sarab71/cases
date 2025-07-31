@@ -1,7 +1,13 @@
 import Link from 'next/link';
 import LogoutButton from './LogoutButton';
+import { useAuth } from '@/hooks/useAuth';
 
 export default function Header() {
+  const isAuthenticated = useAuth();
+  if (isAuthenticated === false || isAuthenticated === null) {
+    return null;
+  }
+
   return (
     <header className="bg-blue-600 text-white shadow-md p-4 flex justify-center items-center">
       <nav className="space-x-4 flex justify-center">
