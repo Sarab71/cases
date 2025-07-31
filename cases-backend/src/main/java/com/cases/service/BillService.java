@@ -36,10 +36,6 @@ public class BillService {
             throw new RuntimeException("Customer not found");
         }
 
-        double grandTotal = request.getItems().stream()
-            .mapToDouble(BillItem::getTotalAmount)
-            .sum();
-
         int latestInvoiceNumber = billRepository.findTopByOrderByInvoiceNumberDesc()
                 .map(b -> b.getInvoiceNumber() + 1)
                 .orElse(1001);
@@ -48,7 +44,8 @@ public class BillService {
         bill.setCustomer(optionalCustomer.get());
         bill.setInvoiceNumber(latestInvoiceNumber);
         bill.setItems(request.getItems());
-        bill.setGrandTotal(grandTotal);
+        bill.setTotalQty(request.getTotalQty());
+        bill.setGrandTotal(request.getGrandTotal());
         bill.setDate(request.getDate() != null ? request.getDate() : LocalDate.now());
         bill.setDueDate(LocalDate.now());
 
@@ -56,7 +53,7 @@ public class BillService {
 
         Transaction transaction = Transaction.builder()
                 .customer(optionalCustomer.get())
-                .amount(grandTotal)
+                .amount(request.getGrandTotal())
                 .type("debit")
                 .description("Bill Invoice #" + latestInvoiceNumber)
                 .date(bill.getDate())
@@ -68,7 +65,7 @@ public class BillService {
 
         // Update customer balance
         Customer customer = optionalCustomer.get();
-        customer.setBalance(customer.getBalance() - grandTotal);
+        customer.setBalance(customer.getBalance() - request.getGrandTotal());
         customerRepository.save(customer);
 
         return convertToDto(saved);
@@ -98,17 +95,12 @@ public class BillService {
 
         double oldGrandTotal = bill.getGrandTotal();
 
-        List<BillItem> updatedItems = request.getItems().stream().map(item -> {
-            double discount = item.getDiscount() != null ? item.getDiscount() : 0;
-            double discountAmount = item.getRate() * (discount / 100);
-            double totalAmount = (item.getRate() - discountAmount) * item.getQuantity();
-            item.setTotalAmount(totalAmount);
-            return item;
-        }).collect(Collectors.toList());
+        List<BillItem> updatedItems = request.getItems();
 
         double newGrandTotal = request.getGrandTotal();
 
         bill.setItems(updatedItems);
+        bill.setTotalQty(request.getTotalQty());
         bill.setInvoiceNumber(
                 request.getInvoiceNumber() != null ? request.getInvoiceNumber() : bill.getInvoiceNumber());
         bill.setGrandTotal(newGrandTotal);
@@ -176,6 +168,7 @@ public class BillService {
                 .customerName(bill.getCustomer().getName())
                 .date(bill.getDate())
                 .items(bill.getItems())
+                .totalQty(bill.getTotalQty())
                 .grandTotal(bill.getGrandTotal())
                 .dueDate(bill.getDueDate())
                 .build();

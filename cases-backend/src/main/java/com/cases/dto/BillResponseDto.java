@@ -21,6 +21,7 @@ public class BillResponseDto {
     private String customerName;
     private LocalDate date;
     private List<BillItem> items;
+    private int totalQty;
     private double grandTotal;
     private LocalDate dueDate;
 

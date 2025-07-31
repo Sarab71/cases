@@ -11,6 +11,7 @@ import lombok.Data;
 public class BillUpdateRequestDto {
     private Integer invoiceNumber;
     private List<BillItem> items;
+    private int totalQty;
     private LocalDate date;
     private Double grandTotal;
     private LocalDate dueDate;

@@ -11,6 +11,8 @@ import lombok.Data;
 public class BillRequestDto {
     private String customerId;
     private List<BillItem> items;
-    private LocalDate date;           // e.g., bill creation date
-    private LocalDate dueDate;   // e.g., bill due date
+    private int totalQty;
+    private LocalDate date;  
+    private Double grandTotal;
+    private LocalDate dueDate; 
 }
