@@ -39,6 +39,7 @@ export default function EditBillForm({ billId, onClose, onUpdated }: EditBillFor
   const [editDate, setEditDate] = useState<string>('');
   const [customer, setCustomer] = useState<Customer | null>(null);
   const [dueDate, setDueDate] = useState<string>('');
+  const [totalQty, setTotalQty] = useState<number>(0);
 
   useEffect(() => {
     const fetchBill = async () => {
@@ -61,6 +62,12 @@ export default function EditBillForm({ billId, onClose, onUpdated }: EditBillFor
     fetchBill();
   }, [billId]);
 
+  useEffect(() => {
+    const total = calculateTotalQty(items);
+    setTotalQty(total);
+  }, [items]);
+
+
   const handleItemChange = (index: number, field: keyof Item, value: string | number) => {
     const updatedItems = [...items];
     if (field === 'modelNumber') {
@@ -82,6 +89,10 @@ export default function EditBillForm({ billId, onClose, onUpdated }: EditBillFor
     return netAmount - (netAmount * (item.discount / 100));
   };
 
+  const calculateTotalQty = (itemsList: Item[]) => {
+    return itemsList.reduce((sum, item) => sum + Number(item.quantity || 0), 0);
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
@@ -98,6 +109,7 @@ export default function EditBillForm({ billId, onClose, onUpdated }: EditBillFor
         dueDate: dueDate,
         items: updatedItems,
         grandTotal,
+        totalQty,
       });
 
       toast.success('Bill updated successfully!');
@@ -258,6 +270,10 @@ export default function EditBillForm({ billId, onClose, onUpdated }: EditBillFor
             ))}
           </tbody>
         </table>
+        <div className="flex justify-end text-sm font-medium mt-2">
+          <span className="bg-white px-3 py-1 border rounded">Total Quantity: {totalQty}</span>
+        </div>
+
       </div>
 
       <div className="flex flex-wrap gap-2 justify-end">

@@ -27,6 +27,7 @@ export default function CreateBillForm() {
   const [items, setItems] = useState<Item[]>([{ modelNumber: '', quantity: '', rate: '', discount: '' }]);
   const [grandTotal, setGrandTotal] = useState<number>(0);
   const [selectedIndex, setSelectedIndex] = useState<number>(-1);
+  const [totalQty, setTotalQty] = useState<number>(0);
 
   const fetchNextInvoiceNumber = async () => {
     try {
@@ -98,17 +99,26 @@ export default function CreateBillForm() {
   };
 
   const calculateGrandTotal = (itemsList: Item[]) => {
-    const total = itemsList.reduce((sum, item) => {
+    let grandTotal = 0;
+    let quantityTotal = 0;
+
+    for (const item of itemsList) {
       const quantity = Number(item.quantity) || 0;
       const rate = Number(item.rate) || 0;
       const discount = Number(item.discount) || 0;
 
       const discountAmount = (rate * discount) / 100;
       const netPrice = rate - discountAmount;
-      return sum + netPrice * quantity;
-    }, 0);
-    setGrandTotal(Math.round(total));
+      const itemTotal = netPrice * quantity;
+
+      grandTotal += itemTotal;
+      quantityTotal += quantity;
+    }
+
+    setGrandTotal(Math.round(grandTotal));
+    setTotalQty(quantityTotal);
   };
+
 
   const handleAddItem = () => {
     setItems([...items, { modelNumber: '', quantity: '', rate: '', discount: '' }]);
@@ -156,6 +166,7 @@ export default function CreateBillForm() {
       date: billDate,
       items: processedItems,
       grandTotal,
+      totalQty,
     };
 
     try {
@@ -368,6 +379,11 @@ export default function CreateBillForm() {
       <div className="mt-4 text-right font-semibold text-lg">
         Grand Total: ₹{Math.round(grandTotal)}
       </div>
+
+      <div className="text-right font-medium">
+        Total Quantity: {totalQty}
+      </div>
+
 
       <div className="flex gap-2 justify-end">
         <button type="submit" className="bg-green-600 text-white py-2 px-4 rounded hover:bg-green-700 cursor-pointer">
