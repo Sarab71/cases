@@ -9,23 +9,23 @@ export default function LoginForm() {
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
 
-const handleLogin = async () => {
-  const res = await fetch('/api/login', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({ username, password }),
-  });
+  const handleLogin = async () => {
+    const res = await fetch('/api/login', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ username, password }),
+    });
 
-  const data = await res.json();
+    const data = await res.json();
 
-  if (data.success) {
-    window.location.href = '/';
-  } else {
-    setError('Invalid credentials');
-  }
-};
+    if (data.success) {
+      window.location.href = '/';
+    } else {
+      setError('Invalid credentials');
+    }
+  };
 
 
   return (
