@@ -15,32 +15,27 @@ export default function Home() {
   const [totalPayments, setTotalPayments] = useState(0);
   const [totalExpenses, setTotalExpenses] = useState(0);
 
-  const handleBackupDownload = async () => {
-    try {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_BACKUP_API_URL}/api/backup`, {
-        method: 'GET',
-      });
-
-      if (!response.ok) {
-        throw new Error('Failed to download backup');
+const handleBackupDownload = async () => {
+  try {
+    const response = await axios.get(
+      `${process.env.NEXT_PUBLIC_BACKUP_API_URL}/api/backup`,
+      {
+        responseType: 'blob', // important for binary file like ZIP
       }
+    );
 
-      const blob = await response.blob();
-      const url = window.URL.createObjectURL(new Blob([blob]));
-
-      const link = document.createElement('a');
-      link.href = url;
-      link.setAttribute('download', 'mongodb-backup.zip');
-      document.body.appendChild(link);
-      link.click();
-      link.remove();
-
-    } catch (error) {
-      console.error('Backup download failed:', error);
-      alert('Failed to download backup.');
-    }
-  };
-
+    const url = window.URL.createObjectURL(new Blob([response.data]));
+    const link = document.createElement('a');
+    link.href = url;
+    link.setAttribute('download', 'mongodb-backup.zip');
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+  } catch (error) {
+    console.error('Backup download failed:', error);
+    alert('Failed to download backup.');
+  }
+};
 
   useEffect(() => {
     async function fetchTotals() {
