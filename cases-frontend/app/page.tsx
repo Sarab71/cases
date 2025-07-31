@@ -15,6 +15,33 @@ export default function Home() {
   const [totalPayments, setTotalPayments] = useState(0);
   const [totalExpenses, setTotalExpenses] = useState(0);
 
+  const handleBackupDownload = async () => {
+    try {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_BACKUP_API_URL}/api/backup`, {
+        method: 'GET',
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to download backup');
+      }
+
+      const blob = await response.blob();
+      const url = window.URL.createObjectURL(new Blob([blob]));
+
+      const link = document.createElement('a');
+      link.href = url;
+      link.setAttribute('download', 'mongodb-backup.zip');
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+
+    } catch (error) {
+      console.error('Backup download failed:', error);
+      alert('Failed to download backup.');
+    }
+  };
+
+
   useEffect(() => {
     async function fetchTotals() {
       const params = new URLSearchParams();
@@ -50,7 +77,7 @@ export default function Home() {
     fetchTotals();
   }, [startDate, endDate]);
 
-  const totalOutstanding = totalSales - totalPayments ;
+  const totalOutstanding = totalSales - totalPayments;
 
   return (
     <div className="flex">
@@ -89,8 +116,17 @@ export default function Home() {
           <TotalOutstanding value={totalOutstanding} />
           <PaymentsReceived value={totalPayments} />
           <TotalSales value={totalSales} />
-          <TotalExpenses value={totalExpenses}/>
+          <TotalExpenses value={totalExpenses} />
         </div>
+        <div className="flex justify-center my-4">
+          <button
+            onClick={handleBackupDownload}
+            className="bg-blue-600 text-white font-semibold px-4 py-2 rounded hover:bg-blue-700 transition duration-300 cursor-pointer"
+          >
+            Download MongoDB Backup
+          </button>
+        </div>
+
       </main>
     </div>
   );
