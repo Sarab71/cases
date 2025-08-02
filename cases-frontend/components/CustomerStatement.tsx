@@ -63,17 +63,11 @@ export default function CustomerStatement({ customerId, customerName }: Props) {
 
     const downloadStatementPdf = async () => {
         try {
-            // ✅ Convert dates in transactions to dd-mm-yyyy
-            const formattedTransactions = transactions.map((tx) => ({
-                ...tx,
-                date: new Date(tx.date).toLocaleDateString(), // dd-mm-yyyy format
-            }));
-
             const response = await axios.post(
                 `${process.env.NEXT_PUBLIC_PDF_API_URL}/generate-statement`,
                 {
                     customerName,
-                    transactions: formattedTransactions,
+                    transactions,
                 },
                 {
                     responseType: 'blob',
@@ -94,7 +88,6 @@ export default function CustomerStatement({ customerId, customerName }: Props) {
             alert('Failed to download statement PDF');
         }
     };
-
 
 
     return (
