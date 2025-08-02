@@ -9,7 +9,7 @@ export default function Header() {
   }
 
   return (
-    <header className="bg-blue-600 text-white shadow-md p-4 flex justify-center items-center">
+    <header className="bg-blue-700 text-white shadow-md p-4 flex justify-center items-center">
       <nav className="space-x-4 flex justify-center">
         <Link href="/" className="hover:underline">Home</Link>
         <Link href="/add-customer" className="hover:underline">Add Customer</Link>
