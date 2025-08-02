@@ -10,6 +10,7 @@ interface Bill {
   invoiceNumber: number;
   grandTotal: number;
   dueDate: string;
+  date: string;
 }
 
 export default function TodayDueSideBar() {
@@ -42,6 +43,7 @@ export default function TodayDueSideBar() {
             <li key={bill.id}>
               <div className="p-2 bg-blue-500 rounded text-white hover:bg-blue-400 transition">
                 <p className="font-semibold">{bill.customerName}</p>
+                <p>Bill Date: {format(new Date(bill.date), 'dd/MM/yyyy')}</p>
                 <p>Invoice #: {bill.invoiceNumber}</p>
                 <p>₹ {bill.grandTotal}</p>
               </div>
