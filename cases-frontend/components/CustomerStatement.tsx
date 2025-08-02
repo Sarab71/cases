@@ -60,6 +60,36 @@ export default function CustomerStatement({ customerId, customerName }: Props) {
         }
     };
 
+
+    const downloadStatementPdf = async () => {
+        try {
+            const response = await axios.post(
+                `${process.env.NEXT_PUBLIC_PDF_API_URL}/generate-statement`,
+                {
+                    customerName,
+                    transactions,
+                },
+                {
+                    responseType: 'blob',
+                }
+            );
+
+            const blob = new Blob([response.data], { type: 'application/pdf' });
+            const url = window.URL.createObjectURL(blob);
+
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = `Statement_${customerName.replace(/\s+/g, '_')}.pdf`;
+            link.click();
+
+            window.URL.revokeObjectURL(url);
+        } catch (error) {
+            console.error('Failed to download statement PDF:', error);
+            alert('Failed to download statement PDF');
+        }
+    };
+
+
     return (
         <div className="bg-white p-4 rounded shadow">
             <h2 className="text-xl font-bold mb-4">Statement of {customerName}</h2>
@@ -93,10 +123,10 @@ export default function CustomerStatement({ customerId, customerName }: Props) {
                                         <td className="border p-2">{date}</td>
                                         <td
                                             className={`border p-2 ${txn.relatedBillId
-                                                    ? 'text-blue-600 cursor-pointer hover:underline'
-                                                    : isPayment
-                                                        ? 'text-green-600 cursor-pointer hover:underline'
-                                                        : ''
+                                                ? 'text-blue-600 cursor-pointer hover:underline'
+                                                : isPayment
+                                                    ? 'text-green-600 cursor-pointer hover:underline'
+                                                    : ''
                                                 }`}
                                             onClick={() => {
                                                 if (txn.relatedBillId) {
@@ -120,6 +150,14 @@ export default function CustomerStatement({ customerId, customerName }: Props) {
                             })}
                         </tbody>
                     </table>
+
+                    <button
+                        onClick={downloadStatementPdf}
+                        className="mt-4 mb-4 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 cursor-pointer"
+                    >
+                        Download Statement PDF
+                    </button>
+
 
                     {selectedBillId && (
                         <div className="mt-6">
