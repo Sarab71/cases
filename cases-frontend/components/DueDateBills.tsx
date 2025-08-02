@@ -69,8 +69,8 @@ export default function DueDateBills() {
             <div key={bill.id} className="border p-3 rounded shadow-sm bg-gray-50">
               <p><strong>Invoice #:</strong> {bill.invoiceNumber}</p>
               <p><strong>Customer Name:</strong> {bill.customerName}</p>
-              <p><strong>Bill Date:</strong> {format(new Date(bill.date), 'yyyy-MM-dd HH:mm')}</p>
-              <p><strong>Due Date:</strong> {bill.dueDate}</p>
+              <p><strong>Bill Date:</strong> {format(new Date(bill.date), 'dd/MM/yyyy')}</p>
+              <p><strong>Due Date:</strong> {format(new Date(bill.dueDate), 'dd/MM/yyyy')}</p>
               <p><strong>Grand Total:</strong> ₹{bill.grandTotal}</p>
             </div>
           ))}
