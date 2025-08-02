@@ -66,7 +66,7 @@ export default function CustomerStatement({ customerId, customerName }: Props) {
             // ✅ Convert dates in transactions to dd-mm-yyyy
             const formattedTransactions = transactions.map((tx) => ({
                 ...tx,
-                date: new Date(tx.date).toLocaleDateString('en-GB'), // dd-mm-yyyy format
+                date: new Date(tx.date).toLocaleDateString(), // dd-mm-yyyy format
             }));
 
             const response = await axios.post(
