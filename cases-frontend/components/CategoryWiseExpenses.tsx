@@ -3,6 +3,7 @@
 import axios from '@/lib/axios';
 import { useEffect, useState } from 'react';
 import { toast } from 'react-toastify';
+import { format } from 'date-fns';
 
 interface CategoryWiseExpensesProps {
   refreshTrigger?: number;
@@ -101,7 +102,7 @@ export default function CategoryWiseExpenses({ refreshTrigger }: CategoryWiseExp
             <ul className="divide-y">
               {category.expenses.map(exp => (
                 <li key={exp.id} className="py-2 flex justify-between text-sm items-center">
-                  <span>{exp.date}</span>
+                  <span>{format(new Date(exp.date), 'dd/MM/yyyy')}</span>
                   <span>{exp.description}</span>
                   <span>₹{exp.amount.toFixed(2)}</span>
                   <button
