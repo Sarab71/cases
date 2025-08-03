@@ -154,7 +154,7 @@ export default function AddPaymentForm() {
       </div>
 
       <div>
-        <label className="block font-medium">Date & Time</label>
+        <label className="block font-medium">Date</label>
         <input
           type="date"
           value={date}
