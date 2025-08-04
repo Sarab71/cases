@@ -23,16 +23,20 @@ const Page = () => {
       <div className="grid gap-6">
         <div className="border rounded-lg p-4 shadow-sm">
           <h2 className="text-lg font-semibold mb-2">Create Expense Category</h2>
-          <CreateExpenseCategoryForm onCategoryAdded={handleCategoryAdded}/>
+          <CreateExpenseCategoryForm onCategoryAdded={handleCategoryAdded} />
         </div>
 
         <div className="border rounded-lg p-4 shadow-sm">
           <h2 className="text-lg font-semibold mb-2">Add New Expense</h2>
-          <ExpenseForm onExpenseAdded={handleExpenseAdded} refreshCategoryTrigger={refreshCategoryTrigger}/>
+          <ExpenseForm onExpenseAdded={handleExpenseAdded} refreshCategoryTrigger={refreshCategoryTrigger} />
         </div>
 
         <div>
-          <CategoryWiseExpenses refreshTrigger={refreshTrigger} />
+          <CategoryWiseExpenses
+            refreshTrigger={refreshTrigger}
+            refreshCategoryTrigger={refreshCategoryTrigger}
+          />
+
         </div>
       </div>
     </div>

@@ -1,12 +1,13 @@
 'use client';
 
 import axios from '@/lib/axios';
-import { useEffect, useState, useCallback } from 'react';
-import { toast } from 'react-toastify';
 import { format } from 'date-fns';
+import { useEffect, useState } from 'react';
+import { toast } from 'react-toastify';
 
 interface CategoryWiseExpensesProps {
   refreshTrigger?: number;
+  refreshCategoryTrigger?: number;
 }
 interface Expense {
   id: string;
@@ -21,7 +22,7 @@ interface CategoryWithExpenses {
   expenses: Expense[];
 }
 
-export default function CategoryWiseExpenses({ refreshTrigger }: CategoryWiseExpensesProps) {
+export default function CategoryWiseExpenses({ refreshTrigger, refreshCategoryTrigger }: CategoryWiseExpensesProps) {
   const [data, setData] = useState<CategoryWithExpenses[]>([]);
   const [loading, setLoading] = useState(true);
   const [localTrigger, setLocalTrigger] = useState(0);
@@ -57,7 +58,7 @@ export default function CategoryWiseExpenses({ refreshTrigger }: CategoryWiseExp
     }
 
     fetchCategoryExpenses();
-  }, [startDate, endDate, refreshTrigger, localTrigger]);
+  }, [startDate, endDate, refreshTrigger, localTrigger, refreshCategoryTrigger]);
 
 
   const handleDeleteExpense = async (id: string) => {
