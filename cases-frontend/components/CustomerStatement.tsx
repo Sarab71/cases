@@ -131,13 +131,8 @@ export default function CustomerStatement({ customerId, customerName }: Props) {
                         className="border border-gray-300 rounded px-2 py-1"
                     />
                 </div>
-                <button
-                    onClick={fetchTransactions}
-                    className="mt-6 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
-                >
-                    Filter
-                </button>
             </div>
+
 
 
             {loading ? (
