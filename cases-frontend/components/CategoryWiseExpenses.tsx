@@ -1,7 +1,7 @@
 'use client';
 
 import axios from '@/lib/axios';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { toast } from 'react-toastify';
 import { format } from 'date-fns';
 
@@ -25,35 +25,40 @@ export default function CategoryWiseExpenses({ refreshTrigger }: CategoryWiseExp
   const [data, setData] = useState<CategoryWithExpenses[]>([]);
   const [loading, setLoading] = useState(true);
   const [localTrigger, setLocalTrigger] = useState(0);
+  const [startDate, setStartDate] = useState<string>('');
+  const [endDate, setEndDate] = useState<string>('');
 
   useEffect(() => {
-    async function fetchData() {
+    async function fetchCategoryExpenses() {
       setLoading(true);
       try {
-        const categoriesRes = await axios.get('/expenses/categories');
-        const categories = categoriesRes.data;
+        const params = new URLSearchParams();
 
-        const allData: CategoryWithExpenses[] = await Promise.all(
-          categories.map(async (cat: any) => {
-            const expensesRes = await axios.get(`/expenses/category/${cat.id}`);
-            return {
-              id: cat.id,
-              name: cat.name,
-              expenses: expensesRes.data,
-            };
-          })
-        );
+        if (startDate) {
+          const start = new Date(startDate);
+          start.setHours(0, 0, 0, 0); // Start of day
+          params.append('startDate', start.toISOString().split('T')[0]);
+        }
 
-        setData(allData);
+        if (endDate) {
+          const end = new Date(endDate);
+          end.setHours(23, 59, 59, 999); // End of day
+          params.append('endDate', end.toISOString().split('T')[0]);
+        }
+
+        const url = `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/expenses/categories/filter?${params}`;
+        const res = await axios.get(url);
+        setData(res.data);
       } catch (err) {
-        toast.error('Failed to load expenses');
+        console.error('Failed to fetch filtered category expenses', err);
       } finally {
         setLoading(false);
       }
     }
 
-    fetchData();
-  }, [refreshTrigger, localTrigger]);
+    fetchCategoryExpenses();
+  }, [startDate, endDate, refreshTrigger, localTrigger]);
+
 
   const handleDeleteExpense = async (id: string) => {
     if (!confirm('Are you sure you want to delete this expense?')) return;
@@ -81,7 +86,30 @@ export default function CategoryWiseExpenses({ refreshTrigger }: CategoryWiseExp
   if (data.length === 0) return <p className="p-4">No categories found.</p>;
 
   return (
+
+
     <div className="space-y-6 p-4">
+      <div className="flex gap-4 items-center mb-4">
+        <div>
+          <label className="block text-sm mb-1">Start Date</label>
+          <input
+            type="date"
+            className="border px-2 py-1 rounded"
+            value={startDate}
+            onChange={(e) => setStartDate(e.target.value)}
+          />
+        </div>
+        <div>
+          <label className="block text-sm mb-1">End Date</label>
+          <input
+            type="date"
+            className="border px-2 py-1 rounded"
+            value={endDate}
+            onChange={(e) => setEndDate(e.target.value)}
+          />
+        </div>
+      </div>
+
       <h2 className="text-2xl font-semibold mb-4">Expenses by Category</h2>
 
       {data.map(category => (

@@ -1,6 +1,7 @@
 package com.cases.service;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.http.HttpStatus;
@@ -9,6 +10,7 @@ import org.springframework.web.server.ResponseStatusException;
 
 import com.cases.dto.CreateExpenseCategoryDto;
 import com.cases.dto.CreateExpenseDto;
+import com.cases.dto.ExpenseCategoryWithExpensesDto;
 import com.cases.model.Expense;
 import com.cases.model.ExpenseCategory;
 import com.cases.repository.ExpenseCategoryRepository;
@@ -61,6 +63,37 @@ public class ExpenseService {
                 .stream()
                 .mapToDouble(Expense::getAmount)
                 .sum();
+    }
+
+    public List<ExpenseCategoryWithExpensesDto> getCategoriesWithFilteredExpenses(String startDateStr,
+            String endDateStr) {
+        List<ExpenseCategory> categories = categoryRepo.findAll();
+        List<ExpenseCategoryWithExpensesDto> result = new ArrayList<>();
+
+        LocalDate startDate = null;
+        LocalDate endDate = null;
+
+        if (startDateStr != null && endDateStr != null) {
+            startDate = LocalDate.parse(startDateStr);
+            endDate = LocalDate.parse(endDateStr).plusDays(1); // to make it inclusive
+        }
+
+        for (ExpenseCategory category : categories) {
+            List<Expense> expenses;
+
+            if (startDate != null && endDate != null) {
+                expenses = expenseRepo.findByCategoryIdAndDateBetween(category.getId(), startDate, endDate);
+            } else {
+                expenses = expenseRepo.findByCategoryId(category.getId());
+            }
+
+            result.add(new ExpenseCategoryWithExpensesDto(
+                    category.getId(),
+                    category.getName(),
+                    expenses));
+        }
+
+        return result;
     }
 
     public void deleteExpense(String id) {

@@ -29,18 +29,36 @@ export default function CustomerStatement({ customerId, customerName }: Props) {
     const [loading, setLoading] = useState<boolean>(true);
     const [selectedBillId, setSelectedBillId] = useState<string | null>(null);
     const [selectedPaymentId, setSelectedPaymentId] = useState<string | null>(null);
+    const [startDate, setStartDate] = useState<string>('');
+    const [endDate, setEndDate] = useState<string>('');
 
     const fetchTransactions = useCallback(async () => {
         setLoading(true);
         try {
-            const res = await axios.get(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/customers/${customerId}/statement`);
+            const params = new URLSearchParams();
+
+            if (startDate) {
+                const start = new Date(startDate);
+                start.setHours(0, 0, 0, 0); // Start of day
+                params.append('startDate', start.toISOString().split('T')[0]);
+            }
+
+            if (endDate) {
+                const end = new Date(endDate);
+                end.setHours(23, 59, 59, 999); // End of day
+                params.append('endDate', end.toISOString().split('T')[0]);
+            }
+
+            const url = `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/customers/${customerId}/statement?${params}`;
+            const res = await axios.get(url);
             setTransactions(res.data);
         } catch (err) {
             console.error('Failed to fetch transactions', err);
         } finally {
             setLoading(false);
         }
-    }, [customerId]);
+    }, [customerId, startDate, endDate]);
+
 
     useEffect(() => {
         fetchTransactions();
@@ -94,6 +112,34 @@ export default function CustomerStatement({ customerId, customerName }: Props) {
         <div className="bg-white p-4 rounded shadow">
             <h2 className="text-xl font-bold mb-4">Statement of {customerName}</h2>
 
+            <div className="flex flex-wrap gap-4 items-center mb-4">
+                <div>
+                    <label className="block text-sm font-medium">Start Date</label>
+                    <input
+                        type="date"
+                        value={startDate}
+                        onChange={(e) => setStartDate(e.target.value)}
+                        className="border border-gray-300 rounded px-2 py-1"
+                    />
+                </div>
+                <div>
+                    <label className="block text-sm font-medium">End Date</label>
+                    <input
+                        type="date"
+                        value={endDate}
+                        onChange={(e) => setEndDate(e.target.value)}
+                        className="border border-gray-300 rounded px-2 py-1"
+                    />
+                </div>
+                <button
+                    onClick={fetchTransactions}
+                    className="mt-6 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+                >
+                    Filter
+                </button>
+            </div>
+
+
             {loading ? (
                 <p>Loading...</p>
             ) : (
@@ -110,7 +156,7 @@ export default function CustomerStatement({ customerId, customerName }: Props) {
                         </thead>
                         <tbody>
                             {transactions.map((txn, index) => {
-                                const date = new Date(txn.date).toLocaleDateString();
+                                const date = new Date(txn.date).toLocaleDateString('en-GB'); // gives dd-MM-yyyy
                                 const debit = txn.debit ? Number(txn.debit).toFixed(2) : '';
                                 const credit = txn.credit ? Number(txn.credit).toFixed(2) : '';
                                 const balance = Number(txn.balance).toFixed(2);

@@ -16,8 +16,7 @@ public interface ExpenseRepository extends MongoRepository<Expense, String> {
 
     List<Expense> findByDateBetween(LocalDate startDate, LocalDate endDate);
 
-    @Query("{ 'categoryId': ?0, 'date': { $gte: ?1, $lte: ?2 } }")
-    List<Expense> findByCategoryIdAndDateRange(String categoryId, LocalDate start, LocalDate end);
+    List<Expense> findByCategoryIdAndDateBetween(String categoryId, LocalDate start, LocalDate end);
 
     @Query(value = "{ 'date': { $gte: ?0, $lte: ?1 } }", fields = "{ 'amount': 1 }")
     List<Expense> findAmountsByDateBetween(LocalDate start, LocalDate end);

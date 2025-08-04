@@ -1,6 +1,7 @@
 package com.cases.service;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -24,9 +25,18 @@ public class StatementService {
     private final TransactionRepository transactionRepository;
     private final BillRepository billRepository;
 
-    public List<StatementTransactionDTO> getCustomerStatement(String customerId) {
-        List<Transaction> transactions = transactionRepository
-                .findByCustomer_IdOrderByDateAsc(customerId); // 🟢 Note: use embedded Customer reference
+    public List<StatementTransactionDTO> getCustomerStatement(String customerId, String startDateStr,
+            String endDateStr) {
+        List<Transaction> transactions;
+
+        if (startDateStr != null && endDateStr != null) {
+            LocalDate startDate = LocalDate.parse(startDateStr);
+            LocalDate endDate = LocalDate.parse(endDateStr).plusDays(1);
+            transactions = transactionRepository.findByCustomer_IdAndDateBetweenOrderByDateAsc(customerId, startDate,
+                    endDate);
+        } else {
+            transactions = transactionRepository.findByCustomer_IdOrderByDateAsc(customerId);
+        }
 
         BigDecimal balance = BigDecimal.ZERO;
 
@@ -72,8 +82,7 @@ public class StatementService {
                     relatedBillId,
                     txn.getType(),
                     amount,
-                    txn.getDescription()
-            ));
+                    txn.getDescription()));
         }
 
         return statement;

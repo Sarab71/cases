@@ -15,9 +15,12 @@ public interface TransactionRepository extends MongoRepository<Transaction, Stri
 
     // ✅ fetch transaction where relatedBill._id == billId
     Optional<Transaction> findByRelatedBill_Id(String billId);
-    
+
     List<Transaction> findByType(String type);
 
     List<Transaction> findByTypeAndDateBetween(String type, LocalDate startDate, LocalDate endDate);
+
+    List<Transaction> findByCustomer_IdAndDateBetweenOrderByDateAsc(String customerId, LocalDate startDate,
+            LocalDate endDate);
 
 }

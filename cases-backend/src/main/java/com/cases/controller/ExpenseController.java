@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.cases.dto.CreateExpenseCategoryDto;
 import com.cases.dto.CreateExpenseDto;
+import com.cases.dto.ExpenseCategoryWithExpensesDto;
 import com.cases.model.Expense;
 import com.cases.model.ExpenseCategory;
 import com.cases.repository.ExpenseRepository;
@@ -77,6 +78,13 @@ public class ExpenseController {
         } catch (Exception e) {
             return ResponseEntity.internalServerError().body("Error calculating total expenses: " + e.getMessage());
         }
+    }
+
+    @GetMapping("/categories/filter")
+    public ResponseEntity<List<ExpenseCategoryWithExpensesDto>> getCategoriesWithFilteredExpenses(
+            @RequestParam(required = false) String startDate,
+            @RequestParam(required = false) String endDate) {
+        return ResponseEntity.ok(service.getCategoriesWithFilteredExpenses(startDate, endDate));
     }
 
     @DeleteMapping("/{id}")
