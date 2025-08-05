@@ -1,7 +1,7 @@
 'use client';
 
 import axios from '@/lib/axios';
-import { useEffect, useState } from 'react';
+import { ChangeEvent, KeyboardEvent, useEffect, useState } from 'react';
 import { toast } from 'react-toastify';
 
 interface Item {
@@ -40,6 +40,52 @@ export default function EditBillForm({ billId, onClose, onUpdated }: EditBillFor
   const [customer, setCustomer] = useState<Customer | null>(null);
   const [dueDate, setDueDate] = useState<string>('');
   const [totalQty, setTotalQty] = useState<number>(0);
+  const [allCustomers, setAllCustomers] = useState<Customer[]>([]);
+  const [customerSearch, setCustomerSearch] = useState('');
+  const [filteredCustomers, setFilteredCustomers] = useState<Customer[]>([]);
+  const [selectedCustomer, setSelectedCustomer] = useState<Customer | null>(null);
+  const [selectedIndex, setSelectedIndex] = useState<number>(-1);
+  const [customers, setCustomers] = useState<Customer[]>([]);
+
+
+  useEffect(() => {
+    fetchCustomers();
+  }, []);
+
+  const fetchCustomers = async () => {
+    try {
+      const res = await axios.get<Customer[]>('/customers');
+      setCustomers(res.data);
+    } catch (error) {
+      console.error("❌ Error fetching customers:", error);
+    }
+  };
+
+
+  useEffect(() => {
+    const matched = allCustomers.find(
+      (cust) => cust.name.toLowerCase() === customerSearch.toLowerCase()
+    );
+
+    if (matched) {
+      setCustomer(matched);
+    } else {
+      setCustomer(null); // Clear if no exact match
+    }
+  }, [customerSearch, allCustomers]);
+
+
+  useEffect(() => {
+    if (customerSearch.trim() === '') {
+      setFilteredCustomers([]);
+      return;
+    }
+
+    const filtered = allCustomers.filter((cust) =>
+      cust.name.toLowerCase().includes(customerSearch.toLowerCase())
+    );
+    setFilteredCustomers(filtered);
+  }, [customerSearch, allCustomers]);
 
   useEffect(() => {
     const fetchBill = async () => {
@@ -54,18 +100,71 @@ export default function EditBillForm({ billId, onClose, onUpdated }: EditBillFor
         // Fetch customer
         const custRes = await axios.get(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/customers/${data.customerId}`);
         setCustomer(custRes.data);
+        setCustomerSearch(custRes.data.name);
       } catch (error) {
         console.error('Failed to fetch bill or customer:', error);
       }
     };
+    const fetchCustomers = async () => {
+      try {
+        const res = await axios.get(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/customers`);
+        setAllCustomers(res.data);
+      } catch (error) {
+        console.error("Failed to fetch all customers:", error);
+      }
+    };
 
     fetchBill();
+    fetchCustomers();
   }, [billId]);
 
   useEffect(() => {
     const total = calculateTotalQty(items);
     setTotalQty(total);
   }, [items]);
+
+  const handleCustomerSearch = (e: ChangeEvent<HTMLInputElement>) => {
+    const term = e.target.value;
+    setCustomerSearch(term);
+    setSelectedIndex(-1);
+
+    if (!term.trim()) {
+      setFilteredCustomers([]);
+      return;
+    }
+
+    setFilteredCustomers(
+      customers.filter((c) => c.name.toLowerCase().includes(term.toLowerCase()))
+    );
+  };
+  const handleCustomerKeyDown = (e: KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'ArrowDown') {
+      e.preventDefault();
+      setSelectedIndex((prev) =>
+        prev < filteredCustomers.length - 1 ? prev + 1 : prev
+      );
+    } else if (e.key === 'ArrowUp') {
+      e.preventDefault();
+      setSelectedIndex((prev) => (prev > 0 ? prev - 1 : prev));
+    } else if (e.key === 'Enter') {
+      if (filteredCustomers[selectedIndex]) {
+        e.preventDefault();
+        handleSelectCustomer(filteredCustomers[selectedIndex]);
+      } else if (filteredCustomers.length === 1) {
+        e.preventDefault();
+        handleSelectCustomer(filteredCustomers[0]);
+      }
+    } else if (e.key === 'Escape') {
+      setFilteredCustomers([]);
+      setSelectedIndex(-1);
+    }
+  };
+
+  const handleSelectCustomer = (customer: Customer) => {
+    setSelectedCustomer(customer);
+    setCustomerSearch(customer.name);
+    setFilteredCustomers([]);
+  };
 
 
   const handleItemChange = (index: number, field: keyof Item, value: string | number) => {
@@ -96,6 +195,11 @@ export default function EditBillForm({ billId, onClose, onUpdated }: EditBillFor
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
+    if (!customer) {
+      toast.error("Please select a valid customer from the list.");
+      return;
+    }
+
     const updatedItems = items.map((item) => {
       const totalAmount = calculateTotalAmount(item);
       return { ...item, totalAmount };
@@ -110,6 +214,7 @@ export default function EditBillForm({ billId, onClose, onUpdated }: EditBillFor
         items: updatedItems,
         grandTotal,
         totalQty,
+        customerId: customer.id, // ✅ Use selected customer
       });
 
       toast.success('Bill updated successfully!');
@@ -120,6 +225,7 @@ export default function EditBillForm({ billId, onClose, onUpdated }: EditBillFor
       toast.error('Failed to update bill.');
     }
   };
+
 
 
   const handleDeleteBill = async () => {
@@ -199,6 +305,35 @@ export default function EditBillForm({ billId, onClose, onUpdated }: EditBillFor
           required
         />
       </div>
+
+      <div className="relative">
+        <label className="block font-medium mb-1">Search Customer</label>
+        <input
+          type="text"
+          value={customerSearch}
+          onChange={handleCustomerSearch}
+          onKeyDown={handleCustomerKeyDown}
+          placeholder="Type customer name"
+          className="w-full border p-2 rounded"
+        />
+
+        {filteredCustomers.length > 0 && (
+          <ul className="absolute z-10 w-full bg-white border rounded mt-1 max-h-48 overflow-y-auto shadow-lg">
+            {filteredCustomers.map((customer, idx) => (
+              <li
+                key={customer.id}
+                onClick={() => handleSelectCustomer(customer)}
+                className={`p-2 cursor-pointer ${idx === selectedIndex ? 'bg-blue-100' : ''}`}
+              >
+                {customer.name} - {customer.address}
+              </li>
+            ))}
+          </ul>
+        )}
+      </div>
+
+
+
       <div>
         <label className="block font-medium mb-1">Due Date</label>
         <input
