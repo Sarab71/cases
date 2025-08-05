@@ -4,6 +4,8 @@ import EditBillForm from '@/components/EditBillForm'; // Adjust the import path 
 import PaymentEditForm from '@/components/PaymentEditForm';
 import axios from '@/lib/axios';
 import { useCallback, useEffect, useState } from 'react';
+import { useRouter } from 'next/navigation';
+
 
 interface Transaction {
     id: string;
@@ -31,6 +33,8 @@ export default function CustomerStatement({ customerId, customerName }: Props) {
     const [selectedPaymentId, setSelectedPaymentId] = useState<string | null>(null);
     const [startDate, setStartDate] = useState<string>('');
     const [endDate, setEndDate] = useState<string>('');
+
+    const router = useRouter();
 
     const fetchTransactions = useCallback(async () => {
         setLoading(true);
@@ -66,15 +70,13 @@ export default function CustomerStatement({ customerId, customerName }: Props) {
 
     const handleInvoiceClick = (billId?: string | null) => {
         if (billId) {
-            setSelectedBillId(billId);
-            setSelectedPaymentId(null); // Close payment form if open
+            router.push(`/edit-bill/${billId}`);
         }
     };
 
     const handlePaymentClick = (paymentId?: string | null) => {
         if (paymentId) {
-            setSelectedPaymentId(paymentId);
-            setSelectedBillId(null); // Close bill form if open
+            router.push(`/edit-payment/${paymentId}`);
         }
     };
 
@@ -198,35 +200,6 @@ export default function CustomerStatement({ customerId, customerName }: Props) {
                     >
                         Download Statement PDF
                     </button>
-
-
-                    {selectedBillId && (
-                        <div className="mt-6">
-                            <h3 className="text-lg font-semibold mb-2">Edit Bill</h3>
-                            <EditBillForm
-                                billId={selectedBillId}
-                                onClose={() => setSelectedBillId(null)}
-                                onUpdated={() => {
-                                    setSelectedBillId(null);
-                                    fetchTransactions();
-                                }}
-                            />
-                        </div>
-                    )}
-
-                    {selectedPaymentId && (
-                        <div className="mt-6">
-                            <h3 className="text-lg font-semibold mb-2">Edit Payment</h3>
-                            <PaymentEditForm
-                                paymentId={selectedPaymentId}
-                                onClose={() => setSelectedPaymentId(null)}
-                                onUpdated={() => {
-                                    setSelectedPaymentId(null);
-                                    fetchTransactions();
-                                }}
-                            />
-                        </div>
-                    )}
                 </>
             )}
         </div>
