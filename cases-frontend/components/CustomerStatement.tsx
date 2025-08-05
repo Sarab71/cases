@@ -39,7 +39,7 @@ export default function CustomerStatement({ customerId, customerName }: Props) {
 
             if (startDate) {
                 const start = new Date(startDate);
-                start.setHours(0, 0, 0, 0); // Start of day
+                start.setHours(0, 0, 0, 0); // Start of day  hard reset
                 params.append('startDate', start.toISOString().split('T')[0]);
             }
 
