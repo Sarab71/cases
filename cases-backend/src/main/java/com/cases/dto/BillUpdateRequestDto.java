@@ -9,6 +9,7 @@ import lombok.Data;
 
 @Data
 public class BillUpdateRequestDto {
+    private String customerId;
     private Integer invoiceNumber;
     private List<BillItem> items;
     private int totalQty;

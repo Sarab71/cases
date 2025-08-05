@@ -42,8 +42,11 @@ public class BillController {
     }
 
     @GetMapping
-    public List<BillResponseDto> getAllBills() {
-        return billService.getAllBills();
+    public ResponseEntity<List<BillResponseDto>> getAllBills(
+            @RequestParam(required = false) String startDate,
+            @RequestParam(required = false) String endDate) {
+        List<BillResponseDto> bills = billService.getAllBills(startDate, endDate);
+        return ResponseEntity.ok(bills);
     }
 
     @GetMapping("/{id}")

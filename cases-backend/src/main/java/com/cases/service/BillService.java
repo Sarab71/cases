@@ -71,8 +71,18 @@ public class BillService {
         return convertToDto(saved);
     }
 
-    public List<BillResponseDto> getAllBills() {
-        return billRepository.findAll().stream()
+    public List<BillResponseDto> getAllBills(String startDate, String endDate) {
+        List<Bill> bills;
+
+        if (startDate != null && endDate != null) {
+            LocalDate start = LocalDate.parse(startDate);
+            LocalDate end = LocalDate.parse(endDate).plusDays(1); // inclusive
+            bills = billRepository.findByDateBetween(start, end);
+        } else {
+            bills = billRepository.findAll();
+        }
+
+        return bills.stream()
                 .map(this::convertToDto)
                 .collect(Collectors.toList());
     }
@@ -94,9 +104,9 @@ public class BillService {
                 .orElseThrow(() -> new RuntimeException("Bill not found"));
 
         double oldGrandTotal = bill.getGrandTotal();
+        Customer oldCustomer = bill.getCustomer();
 
         List<BillItem> updatedItems = request.getItems();
-
         double newGrandTotal = request.getGrandTotal();
 
         bill.setItems(updatedItems);
@@ -104,12 +114,34 @@ public class BillService {
         bill.setInvoiceNumber(
                 request.getInvoiceNumber() != null ? request.getInvoiceNumber() : bill.getInvoiceNumber());
         bill.setGrandTotal(newGrandTotal);
+
         if (request.getDate() != null) {
             bill.setDate(request.getDate());
         }
         if (request.getDueDate() != null) {
             bill.setDueDate(request.getDueDate());
         }
+
+        // Handle customer update if provided and different from current
+        if (request.getCustomerId() != null && !request.getCustomerId().equals(oldCustomer.getId())) {
+            // Get new customer
+            Customer newCustomer = customerRepository.findById(request.getCustomerId())
+                    .orElseThrow(() -> new RuntimeException("New customer not found"));
+
+            // Update balances
+            oldCustomer.setBalance(oldCustomer.getBalance() + oldGrandTotal); // Undo old bill
+            newCustomer.setBalance(newCustomer.getBalance() - newGrandTotal); // Apply new bill
+
+            customerRepository.save(oldCustomer);
+            customerRepository.save(newCustomer);
+
+            bill.setCustomer(newCustomer);
+        } else {
+            // No customer change, update old customer balance normally
+            oldCustomer.setBalance(oldCustomer.getBalance() + (oldGrandTotal - newGrandTotal));
+            customerRepository.save(oldCustomer);
+        }
+
         billRepository.save(bill);
 
         Optional<Transaction> transactionOpt = transactionRepository.findByRelatedBill_Id(billId);
@@ -120,19 +152,20 @@ public class BillService {
             if (request.getDate() != null) {
                 transaction.setDate(request.getDate());
             }
+
+            // If customer changed, update transaction's customer too
+            if (request.getCustomerId() != null && !request.getCustomerId().equals(oldCustomer.getId())) {
+                transaction.setCustomer(bill.getCustomer());
+            }
+
             transactionRepository.save(transaction);
         });
-
-        Customer customer = customerRepository.findById(bill.getCustomer().getId())
-                .orElseThrow(() -> new RuntimeException("Customer not found"));
-        customer.setBalance(customer.getBalance() + (oldGrandTotal - newGrandTotal));
-        customerRepository.save(customer);
 
         Map<String, Object> response = new HashMap<>();
         response.put("message", "Bill, transaction, and customer balance updated.");
         response.put("bill", bill);
         transactionOpt.ifPresent(t -> response.put("transaction", t));
-        response.put("updatedBalance", customer.getBalance());
+        response.put("updatedBalance", bill.getCustomer().getBalance());
 
         return response;
     }

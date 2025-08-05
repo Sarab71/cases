@@ -11,4 +11,5 @@ import com.cases.model.Bill;
 public interface BillRepository extends MongoRepository<Bill, String> {
     Optional<Bill> findTopByOrderByInvoiceNumberDesc(); // for auto-increment
     List<Bill> findByDueDate(LocalDate dueDate);
+    List<Bill> findByDateBetween(LocalDate startDate, LocalDate endDate);
 }
