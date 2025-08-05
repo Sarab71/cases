@@ -46,6 +46,7 @@ export default function EditBillForm({ billId, onClose, onUpdated }: EditBillFor
   const [selectedCustomer, setSelectedCustomer] = useState<Customer | null>(null);
   const [selectedIndex, setSelectedIndex] = useState<number>(-1);
   const [customers, setCustomers] = useState<Customer[]>([]);
+  const [grandTotal, setGrandTotal] = useState(0);
 
 
   useEffect(() => {
@@ -121,6 +122,13 @@ export default function EditBillForm({ billId, onClose, onUpdated }: EditBillFor
   useEffect(() => {
     const total = calculateTotalQty(items);
     setTotalQty(total);
+    const updatedItems = items.map((item) => ({
+      ...item,
+      totalAmount: calculateTotalAmount(item),
+    }));
+
+    const grand = updatedItems.reduce((sum, item) => sum + item.totalAmount!, 0);
+    setGrandTotal(Math.round(grand));
   }, [items]);
 
   const handleCustomerSearch = (e: ChangeEvent<HTMLInputElement>) => {
@@ -166,6 +174,19 @@ export default function EditBillForm({ billId, onClose, onUpdated }: EditBillFor
     setFilteredCustomers([]);
   };
 
+  const handleAddItem = () => {
+    setItems((prevItems) => [
+      ...prevItems,
+      {
+        description: '',
+        modelNumber: '',
+        quantity: 0,
+        rate: 0,
+        discount: 0,
+        totalAmount: 0,
+      },
+    ]);
+  };
 
   const handleItemChange = (index: number, field: keyof Item, value: string | number) => {
     const updatedItems = [...items];
@@ -227,6 +248,8 @@ export default function EditBillForm({ billId, onClose, onUpdated }: EditBillFor
       toast.error('Failed to update bill.');
     }
   };
+
+
 
 
 
@@ -415,16 +438,25 @@ export default function EditBillForm({ billId, onClose, onUpdated }: EditBillFor
               </tr>
             ))}
           </tbody>
+          <div className="mt-4">
+            <button
+              type="button"
+              onClick={handleAddItem}
+              className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 cursor-pointer"
+            >
+              Add Item
+            </button>
+          </div>
         </table>
         <div className="flex justify-end text-sm font-medium mt-2">
           <span className="bg-white px-3 py-1 border rounded">Total Quantity: {totalQty}</span>
+          <span className="bg-white px-3 py-1 border rounded">Grand Total: ₹ {grandTotal}</span>
         </div>
 
       </div>
 
       <div className="flex flex-wrap gap-2 justify-end">
         <button type="submit" className="bg-green-600 text-white px-3 py-1 rounded hover:cursor-pointer">Update Bill</button>
-        <button type="button" onClick={onClose} className="bg-gray-500 text-white px-3 py-1 rounded hover:cursor-pointer">Cancel</button>
         <button type="button" onClick={handleDeleteBill} className="bg-red-600 text-white px-3 py-1 rounded hover:cursor-pointer">Delete Bill</button>
         <button type="button" onClick={downloadPdf} className="bg-blue-600 text-white px-3 py-1 rounded hover:cursor-pointer">Export as PDF</button>
       </div>

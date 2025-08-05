@@ -125,13 +125,6 @@ export default function PaymentEditForm({ paymentId, onClose, onUpdated }: Payme
                 >
                     Delete Payment
                 </button>
-                <button
-                    type="button"
-                    onClick={onClose}
-                    className="bg-gray-500 text-white px-3 py-1 rounded hover:cursor-pointer"
-                >
-                    Cancel
-                </button>
             </div>
         </form>
     );
