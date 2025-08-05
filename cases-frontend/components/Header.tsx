@@ -17,7 +17,7 @@ export default function Header() {
         <Link href="/expenses" className="hover:underline">Expenses</Link>
         <Link href="/create-bill" className="hover:underline">Create Bill</Link>
         <Link href="/customers" className="hover:underline">Customers</Link>
-        <Link href="/due-date" className="hover:underline">Sales</Link>
+        <Link href="/sales" className="hover:underline">Sales</Link>
         <LogoutButton />
 
       </nav>

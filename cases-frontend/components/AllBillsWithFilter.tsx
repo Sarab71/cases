@@ -94,7 +94,7 @@ export default function AllBillsWithFilter() {
                                         </Link>
                                     </td>
                                     <td className="px-4 py-2 border-b">{bill.customerName}</td>
-                                    <td className="px-4 py-2 border-b">{bill.date}</td>
+                                    <td className="px-4 py-2 border-b">{format(new Date(bill.date), 'dd/MM/yyyy')}</td>
                                     <td className="px-4 py-2 border-b">₹{bill.grandTotal.toFixed(2)}</td>
                                 </tr>
                             ))}

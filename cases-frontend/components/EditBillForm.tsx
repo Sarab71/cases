@@ -205,7 +205,9 @@ export default function EditBillForm({ billId, onClose, onUpdated }: EditBillFor
       return { ...item, totalAmount };
     });
 
-    const grandTotal = updatedItems.reduce((sum, item) => sum + item.totalAmount!, 0);
+    const grandTotal = Math.round(
+      updatedItems.reduce((sum, item) => sum + item.totalAmount!, 0)
+    );
 
     try {
       await axios.patch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/bills/${billId}`, {
@@ -259,7 +261,9 @@ export default function EditBillForm({ billId, onClose, onUpdated }: EditBillFor
       };
     });
 
-    const grandTotal = processedItems.reduce((sum, item) => sum + item.totalAmount!, 0);
+    const grandTotal = Math.round(
+      processedItems.reduce((sum, item) => sum + item.totalAmount!, 0)
+    );
 
     try {
       const response = await axios.post(
