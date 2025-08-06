@@ -6,6 +6,7 @@ import TotalExpenses from '@/components/TotalExpenses';
 import TotalOutstanding from '@/components/TotalOutstanding';
 import TotalSales from '@/components/TotalSales';
 import axios from '@/lib/axios';
+import Link from 'next/link';
 import { useEffect, useState } from 'react';
 
 export default function Home() {
@@ -109,7 +110,9 @@ const handleBackupDownload = async () => {
 
         <div className="flex flex-col md:flex-row justify-center items-center gap-6">
           <TotalOutstanding value={totalOutstanding} />
-          <PaymentsReceived value={totalPayments} />
+          <Link href="/payments">
+            <PaymentsReceived value={totalPayments} />
+          </Link>
           <TotalSales value={totalSales} />
           <TotalExpenses value={totalExpenses} />
         </div>

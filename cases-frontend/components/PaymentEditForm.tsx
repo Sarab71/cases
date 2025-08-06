@@ -1,7 +1,7 @@
 'use client';
 
 import axios from '@/lib/axios';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, ChangeEvent, KeyboardEvent } from 'react';
 import { toast } from 'react-toastify';
 
 interface Payment {
@@ -9,6 +9,12 @@ interface Payment {
     date: string;
     amount: number;
     description: string;
+    customerId: string;
+}
+
+interface Customer {
+    id: string;
+    name: string;
 }
 
 interface PaymentEditFormProps {
@@ -23,29 +29,91 @@ export default function PaymentEditForm({ paymentId, onClose, onUpdated }: Payme
     const [editAmount, setEditAmount] = useState<string>('');
     const [editDate, setEditDate] = useState<string>('');
 
+    const [customers, setCustomers] = useState<Customer[]>([]);
+    const [customerSearch, setCustomerSearch] = useState('');
+    const [filteredCustomers, setFilteredCustomers] = useState<Customer[]>([]);
+    const [selectedCustomer, setSelectedCustomer] = useState<Customer | null>(null);
+    const [selectedIndex, setSelectedIndex] = useState<number>(-1);
+
     useEffect(() => {
-        const fetchPayment = async () => {
+        const fetchData = async () => {
             try {
-                const res = await axios.get(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/payments/${paymentId}`);
-                const data = res.data;
-                setPayment(data);
-                setEditAmount(data.amount.toString());
-                setEditDate(data.date ? data.date.split('T')[0] : '');
+                const [paymentRes, customerRes] = await Promise.all([
+                    axios.get(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/payments/${paymentId}`),
+                    axios.get(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/customers`)
+                ]);
+
+                const paymentData = paymentRes.data;
+                setPayment(paymentData);
+                setEditAmount(paymentData.amount.toString());
+                setEditDate(paymentData.date ? paymentData.date.split('T')[0] : '');
+
+                setCustomers(customerRes.data);
+
+                const existingCustomer = customerRes.data.find((c: Customer) => c.id === paymentData.customer.id);
+
+                if (existingCustomer) {
+                    setCustomerSearch(existingCustomer.name);
+                    setSelectedCustomer(existingCustomer);
+                }
             } catch (err) {
                 console.error(err);
-                toast.error('Failed to load payment details.');
+                toast.error('Failed to load payment or customers.');
             } finally {
                 setLoading(false);
             }
         };
 
-        fetchPayment();
+        fetchData();
     }, [paymentId]);
 
+    useEffect(() => {
+        if (customerSearch.trim() === '') {
+            setFilteredCustomers([]);
+            return;
+        }
+
+        const filtered = customers.filter((cust) =>
+            cust.name.toLowerCase().includes(customerSearch.toLowerCase())
+        );
+        setFilteredCustomers(filtered);
+    }, [customerSearch, customers]);
+
+    const handleCustomerSearch = (e: ChangeEvent<HTMLInputElement>) => {
+        setCustomerSearch(e.target.value);
+        setSelectedIndex(-1);
+    };
+
+    const handleCustomerKeyDown = (e: KeyboardEvent<HTMLInputElement>) => {
+        if (e.key === 'ArrowDown') {
+            e.preventDefault();
+            setSelectedIndex((prev) =>
+                prev < filteredCustomers.length - 1 ? prev + 1 : prev
+            );
+        } else if (e.key === 'ArrowUp') {
+            e.preventDefault();
+            setSelectedIndex((prev) => (prev > 0 ? prev - 1 : prev));
+        } else if (e.key === 'Enter') {
+            e.preventDefault();
+            if (filteredCustomers[selectedIndex]) {
+                handleSelectCustomer(filteredCustomers[selectedIndex]);
+            } else if (filteredCustomers.length === 1) {
+                handleSelectCustomer(filteredCustomers[0]);
+            }
+        } else if (e.key === 'Escape') {
+            setFilteredCustomers([]);
+            setSelectedIndex(-1);
+        }
+    };
+
+    const handleSelectCustomer = (customer: Customer) => {
+        setSelectedCustomer(customer);
+        setCustomerSearch(customer.name);
+        setFilteredCustomers([]);
+    };
 
     const handleDelete = async () => {
         if (!payment) return;
-
         const confirmDelete = confirm('Are you sure you want to delete this payment?');
         if (!confirmDelete) return;
 
@@ -60,17 +128,18 @@ export default function PaymentEditForm({ paymentId, onClose, onUpdated }: Payme
         }
     };
 
-
     const handleUpdate = async (e: React.FormEvent) => {
         e.preventDefault();
-        if (!payment) return;
-
-        const localDate = editDate;
+        if (!payment || !selectedCustomer) {
+            toast.error('Please select a customer.');
+            return;
+        }
 
         try {
             await axios.patch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/payments/${paymentId}`, {
                 amount: Number(editAmount),
-                date: localDate,
+                date: editDate,
+                customerId: selectedCustomer.id,
             });
 
             toast.success('Payment updated successfully!');
@@ -81,7 +150,6 @@ export default function PaymentEditForm({ paymentId, onClose, onUpdated }: Payme
             toast.error('Failed to update payment.');
         }
     };
-
 
     if (loading) return <p>Loading payment details...</p>;
     if (!payment) return <p>Payment not found.</p>;
@@ -100,6 +168,7 @@ export default function PaymentEditForm({ paymentId, onClose, onUpdated }: Payme
                     required
                 />
             </div>
+
             <div>
                 <label className="block font-medium mb-1">Amount</label>
                 <input
@@ -109,6 +178,32 @@ export default function PaymentEditForm({ paymentId, onClose, onUpdated }: Payme
                     className="border p-2 rounded w-full"
                     required
                 />
+            </div>
+
+            <div className="relative">
+                <label className="block font-medium mb-1">Customer</label>
+                <input
+                    type="text"
+                    value={customerSearch}
+                    onChange={handleCustomerSearch}
+                    onKeyDown={handleCustomerKeyDown}
+                    placeholder="Search customer"
+                    className="border p-2 rounded w-full"
+                />
+                {filteredCustomers.length > 0 && (
+                    <ul className="absolute z-10 bg-white border rounded mt-1 max-h-48 overflow-y-auto shadow-md w-full">
+                        {filteredCustomers.map((customer, index) => (
+                            <li
+                                key={customer.id}
+                                onClick={() => handleSelectCustomer(customer)}
+                                className={`p-2 cursor-pointer hover:bg-blue-100 ${selectedIndex === index ? 'bg-blue-100' : ''
+                                    }`}
+                            >
+                                {customer.name}
+                            </li>
+                        ))}
+                    </ul>
+                )}
             </div>
 
             <div className="flex gap-2 mt-4">
