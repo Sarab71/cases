@@ -40,9 +40,11 @@ const AllPaymentsWithFilter = () => {
                 const response = await axios.get(
                     `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/payments/all?${params}`
                 );
-                console.log('API Response:', response.data);
+                const sorted = response.data.payments.sort(
+                    (a: Payment, b: Payment) => new Date(a.date).getTime() - new Date(b.date).getTime()
+                );
 
-                setPayments(response.data.payments);
+                setPayments(sorted);
             } catch (err) {
                 console.error('Failed to fetch payments:', err);
             }
@@ -84,11 +86,12 @@ const AllPaymentsWithFilter = () => {
                     {payments.map((payment) => (
                         <tr key={payment.id}>
                             <td className="border px-4 py-2">{payment.customer?.name || 'N/A'}</td>
-                            <Link href={`/edit-payment/${payment.id}`}>
-                                <td className="border px-4 py-2 text-blue-500 hover:underline cursor-pointer">
+                            <td className="border px-4 py-2 text-blue-500 hover:underline cursor-pointer">
+                                <Link href={`/edit-payment/${payment.id}`}>
                                     ₹{payment.amount}
-                                </td>
-                            </Link>
+                                </Link>
+                            </td>
+
                             <td className="border px-4 py-2">{format(new Date(payment.date), 'dd/MM/yyyy')}</td>
                             <td className="border px-4 py-2">{payment.description || '-'}</td>
                         </tr>
