@@ -67,7 +67,9 @@ public class PaymentController {
             PaymentResponseDto response = new PaymentResponseDto(
                     "Payment recorded successfully.",
                     transaction,
-                    customer.getBalance());
+                    customer.getBalance(),
+                    customer.getId(),
+                    customer.getName());
 
             return ResponseEntity.status(201).body(response);
 
@@ -99,6 +101,7 @@ public class PaymentController {
     public ResponseEntity<?> updatePayment(
             @PathVariable String id,
             @RequestBody PaymentRequestDto request) {
+
         Optional<Transaction> optional = transactionRepository.findById(id);
 
         if (optional.isEmpty() || !"credit".equalsIgnoreCase(optional.get().getType())) {
@@ -106,20 +109,38 @@ public class PaymentController {
         }
 
         Transaction payment = optional.get();
-        Customer customer = payment.getCustomer();
+        Customer oldCustomer = payment.getCustomer();
 
-        if (customer == null || !customerRepository.existsById(customer.getId())) {
+        if (oldCustomer == null || !customerRepository.existsById(oldCustomer.getId())) {
             return ResponseEntity.status(404).body(Map.of("message", "Customer not found"));
         }
 
         double oldAmount = payment.getAmount();
         double newAmount = request.getAmount();
 
-        // Balance Adjustment
-        customer.setBalance(customer.getBalance() - oldAmount + newAmount);
-        customerRepository.save(customer);
+        // 🧠 Check if customer is updated
+        if (request.getCustomerId() != null && !request.getCustomerId().equals(oldCustomer.getId())) {
+            // Restore balance of old customer
+            oldCustomer.setBalance(oldCustomer.getBalance() - oldAmount);
+            customerRepository.save(oldCustomer);
 
-        // Payment Update
+            // Set new customer
+            Customer newCustomer = customerRepository.findById(request.getCustomerId())
+                    .orElseThrow(() -> new RuntimeException("New customer not found"));
+
+            // Add balance to new customer
+            newCustomer.setBalance(newCustomer.getBalance() + newAmount);
+            customerRepository.save(newCustomer);
+
+            // Update payment's customer reference
+            payment.setCustomer(newCustomer);
+        } else {
+            // Same customer → just update balance
+            oldCustomer.setBalance(oldCustomer.getBalance() - oldAmount + newAmount);
+            customerRepository.save(oldCustomer);
+        }
+
+        // Update payment details
         payment.setAmount(newAmount);
 
         if (request.getDescription() != null) {
@@ -135,7 +156,7 @@ public class PaymentController {
         return ResponseEntity.ok(Map.of(
                 "message", "Payment updated successfully",
                 "payment", payment,
-                "updatedBalance", customer.getBalance()));
+                "updatedBalance", payment.getCustomer().getBalance()));
     }
 
     // ✅ GET Total Payments (with optional date filters)
@@ -165,6 +186,33 @@ public class PaymentController {
                     "count", creditTxns.size()));
         } catch (Exception e) {
             return ResponseEntity.internalServerError().body("Error fetching total payments: " + e.getMessage());
+        }
+    }
+
+    // ✅ GET: All Payments with Optional Date Filters
+    @GetMapping("/all")
+    public ResponseEntity<?> getAllPayments(
+            @RequestParam(required = false) String startDate,
+            @RequestParam(required = false) String endDate) {
+        try {
+            List<Transaction> creditTxns;
+
+            boolean hasValidDates = startDate != null && !startDate.isBlank()
+                    && endDate != null && !endDate.isBlank();
+
+            if (hasValidDates) {
+                LocalDate start = LocalDate.parse(startDate);
+                LocalDate end = LocalDate.parse(endDate).plusDays(1); // Inclusive
+                creditTxns = transactionRepository.findByTypeAndDateBetween("credit", start, end);
+            } else {
+                creditTxns = transactionRepository.findByType("credit");
+            }
+
+            return ResponseEntity.ok(Map.of(
+                    "payments", creditTxns,
+                    "count", creditTxns.size()));
+        } catch (Exception e) {
+            return ResponseEntity.internalServerError().body("Error fetching payments: " + e.getMessage());
         }
     }
 
