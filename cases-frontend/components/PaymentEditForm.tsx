@@ -28,7 +28,7 @@ export default function PaymentEditForm({ paymentId, onClose, onUpdated }: Payme
     const [loading, setLoading] = useState<boolean>(true);
     const [editAmount, setEditAmount] = useState<string>('');
     const [editDate, setEditDate] = useState<string>('');
-
+    const [editDescription, setEditDescription] = useState<string>(''); // 👈 New state
     const [customers, setCustomers] = useState<Customer[]>([]);
     const [customerSearch, setCustomerSearch] = useState('');
     const [filteredCustomers, setFilteredCustomers] = useState<Customer[]>([]);
@@ -47,7 +47,7 @@ export default function PaymentEditForm({ paymentId, onClose, onUpdated }: Payme
                 setPayment(paymentData);
                 setEditAmount(paymentData.amount.toString());
                 setEditDate(paymentData.date ? paymentData.date.split('T')[0] : '');
-
+                setEditDescription(paymentData.description || '');
                 setCustomers(customerRes.data);
 
                 const existingCustomer = customerRes.data.find((c: Customer) => c.id === paymentData.customer.id);
@@ -140,6 +140,7 @@ export default function PaymentEditForm({ paymentId, onClose, onUpdated }: Payme
                 amount: Number(editAmount),
                 date: editDate,
                 customerId: selectedCustomer.id,
+                description: editDescription,
             });
 
             toast.success('Payment updated successfully!');
@@ -179,6 +180,18 @@ export default function PaymentEditForm({ paymentId, onClose, onUpdated }: Payme
                     required
                 />
             </div>
+
+            <div>
+                <label className="block font-medium mb-1">Description</label>
+                <textarea
+                    value={editDescription}
+                    onChange={e => setEditDescription(e.target.value)}
+                    className="border p-2 rounded w-full"
+                    rows={3}
+                    placeholder="Optional description"
+                />
+            </div>
+
 
             <div className="relative">
                 <label className="block font-medium mb-1">Customer</label>

@@ -4,12 +4,12 @@ import axios from '@/lib/axios';
 import { format } from 'date-fns';
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
-import { start } from 'repl';
 
 interface Payment {
     id: string;
     amount: number;
     date: string;
+    description?: string;
     customer: {
         name: string;
     };
@@ -77,6 +77,7 @@ const AllPaymentsWithFilter = () => {
                         <th className="border px-4 py-2 text-left">Customer Name</th>
                         <th className="border px-4 py-2 text-left">Amount</th>
                         <th className="border px-4 py-2 text-left">Date</th>
+                        <th className="border px-4 py-2 text-left">Description</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -85,10 +86,11 @@ const AllPaymentsWithFilter = () => {
                             <td className="border px-4 py-2">{payment.customer?.name || 'N/A'}</td>
                             <Link href={`/edit-payment/${payment.id}`}>
                                 <td className="border px-4 py-2 text-blue-500 hover:underline cursor-pointer">
-                                    {payment.amount}
+                                    ₹{payment.amount}
                                 </td>
                             </Link>
                             <td className="border px-4 py-2">{format(new Date(payment.date), 'dd/MM/yyyy')}</td>
+                            <td className="border px-4 py-2">{payment.description || '-'}</td>
                         </tr>
                     ))}
                 </tbody>

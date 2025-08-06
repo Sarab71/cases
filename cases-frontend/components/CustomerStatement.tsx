@@ -1,10 +1,8 @@
 'use client';
 
-import EditBillForm from '@/components/EditBillForm'; // Adjust the import path if needed
-import PaymentEditForm from '@/components/PaymentEditForm';
 import axios from '@/lib/axios';
-import { useCallback, useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { useCallback, useEffect, useState } from 'react';
 
 
 interface Transaction {
@@ -29,8 +27,6 @@ interface Props {
 export default function CustomerStatement({ customerId, customerName }: Props) {
     const [transactions, setTransactions] = useState<Transaction[]>([]);
     const [loading, setLoading] = useState<boolean>(true);
-    const [selectedBillId, setSelectedBillId] = useState<string | null>(null);
-    const [selectedPaymentId, setSelectedPaymentId] = useState<string | null>(null);
     const [startDate, setStartDate] = useState<string>('');
     const [endDate, setEndDate] = useState<string>('');
 
@@ -182,7 +178,7 @@ export default function CustomerStatement({ customerId, customerName }: Props) {
                                             {txn.invoiceNumber
                                                 ? `Invoice #${txn.invoiceNumber}`
                                                 : isPayment
-                                                    ? txn.description || txn.particulars || 'Payment'
+                                                    ? 'Payment Received'
                                                     : txn.particulars}
                                         </td>
                                         <td className="border p-2 text-right">{debit}</td>
