@@ -438,16 +438,18 @@ export default function EditBillForm({ billId, onClose, onUpdated }: EditBillFor
               </tr>
             ))}
           </tbody>
-          <div className="mt-4">
-            <button
-              type="button"
-              onClick={handleAddItem}
-              className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 cursor-pointer"
-            >
-              Add Item
-            </button>
-          </div>
         </table>
+
+        <div className="mt-4">
+          <button
+            type="button"
+            onClick={handleAddItem}
+            className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 cursor-pointer"
+          >
+            Add Item
+          </button>
+        </div>
+
         <div className="flex justify-end text-sm font-medium mt-2">
           <span className="bg-white px-3 py-1 border rounded">Total Quantity: {totalQty}</span>
           <span className="bg-white px-3 py-1 border rounded">Grand Total: ₹ {grandTotal}</span>
